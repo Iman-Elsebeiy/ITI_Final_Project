@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import { UserProvider } from "@/contexts/UserContext";
+import { ToastProvider } from "@/components/Toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,12 +31,18 @@ export default function RootLayout({
     "/signup",
     "/forgot-password",
     "/setup",
+    "/welcome",
     "/terms",
     "/privacy",
     "/support",
+    "/offline",
   ];
 
-  const isPublicPage = publicPages.includes(pathname);
+  // Check if it's admin page
+  const isAdminPage = pathname?.startsWith("/admin");
+
+  // Check if it's public page
+  const isPublicPage = publicPages.includes(pathname || "");
 
   return (
     <html
@@ -52,18 +60,25 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="min-h-full flex flex-col bg-[#F1F3F5]">
-        {isPublicPage ? (
-          // Public pages without sidebar
-          <div className="flex-1">{children}</div>
-        ) : (
-          // Authenticated pages with sidebar
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <div className="flex-1 lg:ml-64">
-              <div className="p-6 bg-[#F1F3F5] min-h-screen">{children}</div>
-            </div>
-          </div>
-        )}
+        <UserProvider>
+          <ToastProvider>
+            {isPublicPage ? (
+              // Public pages without sidebar
+              <div className="flex-1">{children}</div>
+            ) : isAdminPage ? (
+              // Admin pages have their own layout
+              <div className="flex-1">{children}</div>
+            ) : (
+              // Authenticated pages with sidebar
+              <div className="flex min-h-screen">
+                <Sidebar />
+                <div className="flex-1 lg:ml-64">
+                  <div className="p-6 bg-[#F1F3F5] min-h-screen">{children}</div>
+                </div>
+              </div>
+            )}
+          </ToastProvider>
+        </UserProvider>
       </body>
     </html>
   );

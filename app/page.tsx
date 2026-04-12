@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function SplashScreen() {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
-
+  // throw new Error("Test error for error page");
   useEffect(() => {
     // Start fade out animation after 2 seconds
     const fadeTimer = setTimeout(() => {
