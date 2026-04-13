@@ -1,6 +1,6 @@
 {
   "node": {
-    "007219de051faeeb467a0c3947b087e8fd6ab1bdea": {
+    "00ffedcfa445f9e8004a0bf545f2be46bca26e1b24": {
       "workers": {
         "app/welcome/page": {
           "moduleId": 25581,
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "003b1e75765455caaed4a31cb33238ba5a0e9fbc70": {
+    "006d4b52f5f5fcddfb75a188374cfbbe004f28a7cc": {
       "workers": {
         "app/welcome/page": {
           "moduleId": 25581,
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "00834783751a717b2f32b68f999322581d31170ecd": {
+    "00a7bf7783974b1177dedbc52c1e589e3928883ad6": {
       "workers": {
         "app/welcome/page": {
           "moduleId": 25581,
@@ -36,7 +36,7 @@
       "exportedName": "getUnreadMessageCount",
       "filename": "lib/data/messages.ts"
     },
-    "00014f1393f5051521c7d2dad8df20f274f40cff8b": {
+    "003ce00063fece7042dd8940b25df309e43e8501aa": {
       "workers": {
         "app/welcome/page": {
           "moduleId": 25581,

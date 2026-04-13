@@ -37,73 +37,60 @@ export async function signup(formData: {
   faculty: string;
 }) {
   try {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        data: {
-          full_name: formData.fullName,
-          university: formData.university,
-          faculty: formData.faculty,
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000"}/auth/callback?next=/setup`,
-      },
-    });
-
-    if (error) {
-      if (error.message?.includes("already registered")) {
-        return { error: "This email is already registered. Please sign in instead." };
-      }
-      return { error: error.message };
-    }
-
-    if (!data.user) {
-      return { error: "Signup failed. Please try again." };
-    }
-
-    const userId = data.user.id;
     const admin = createAdminClient();
 
-    if (!data.session) {
-      await admin.auth.admin.updateUserById(userId, {
-        email_confirm: true,
-      });
-    }
-
-    const { data: existingProfile } = await admin
-      .from("profiles")
-      .select("id")
-      .eq("id", userId)
-      .single();
-
-    if (!existingProfile) {
-      const { error: profileError } = await admin.from("profiles").insert({
-        id: userId,
-        email: formData.email,
+    // Use admin to create user directly — no confirmation email is sent
+    const { data: newUser, error: createError } = await admin.auth.admin.createUser({
+      email: formData.email,
+      password: formData.password,
+      email_confirm: true,
+      user_metadata: {
         full_name: formData.fullName,
         university: formData.university,
         faculty: formData.faculty,
-      });
-      if (profileError) {
-        console.error("Profile insert error:", profileError);
-        return { error: "Failed to create profile. Please try again." };
+      },
+    });
+
+    if (createError) {
+      if (createError.message?.includes("already registered") || createError.message?.includes("already been registered")) {
+        return { error: "This email is already registered. Please sign in instead." };
       }
-      const { error: settingsError } = await admin.from("user_settings").upsert({ id: userId });
-      if (settingsError) {
-        console.error("Settings insert error:", settingsError);
-      }
+      return { error: createError.message };
     }
 
-    if (!data.session) {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-      if (signInError) {
-        return { error: signInError.message };
-      }
+    if (!newUser.user) {
+      return { error: "Signup failed. Please try again." };
+    }
+
+    const userId = newUser.user.id;
+
+    // Create profile and settings
+    const { error: profileError } = await admin.from("profiles").insert({
+      id: userId,
+      email: formData.email,
+      full_name: formData.fullName,
+      university: formData.university,
+      faculty: formData.faculty,
+    });
+    if (profileError) {
+      console.error("Profile insert error:", profileError);
+      await admin.auth.admin.deleteUser(userId);
+      return { error: "Failed to create profile. Please try again." };
+    }
+
+    const { error: settingsError } = await admin.from("user_settings").upsert({ id: userId });
+    if (settingsError) {
+      console.error("Settings insert error:", settingsError);
+    }
+
+    // Sign in the user on the regular client
+    const supabase = await createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+    if (signInError) {
+      return { error: signInError.message };
     }
 
     return { success: true };

@@ -61,7 +61,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$save$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Save$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/save.js [app-ssr] (ecmascript) <export default as Save>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$camera$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Camera$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/camera.js [app-ssr] (ecmascript) <export default as Camera>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check.js [app-ssr] (ecmascript) <export default as CheckCircle2>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$data$3a$dd9476__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__ = __turbopack_context__.i("[project]/app/auth/data:dd9476 [app-ssr] (ecmascript) <text/javascript>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$data$3a$d65e24__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__ = __turbopack_context__.i("[project]/app/auth/data:d65e24 [app-ssr] (ecmascript) <text/javascript>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$data$3a$21b3b7__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__ = __turbopack_context__.i("[project]/lib/data/data:21b3b7 [app-ssr] (ecmascript) <text/javascript>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$data$3a$8143d7__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__ = __turbopack_context__.i("[project]/lib/data/data:8143d7 [app-ssr] (ecmascript) <text/javascript>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$data$3a$d9ada7__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__ = __turbopack_context__.i("[project]/lib/data/data:d9ada7 [app-ssr] (ecmascript) <text/javascript>");
@@ -187,7 +187,7 @@ function SettingsPage() {
         setTimeout(()=>setSaveSuccess(false), 3000);
     };
     const handleLogout = async ()=>{
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$data$3a$dd9476__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__["logout"])();
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$data$3a$d65e24__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$text$2f$javascript$3e$__["logout"])();
     };
     const initials = profileData.fullName ? profileData.fullName.split(" ").map((n)=>n[0]).join("").toUpperCase() : "?";
     const tabs = [

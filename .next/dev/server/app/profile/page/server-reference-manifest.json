@@ -1,6 +1,6 @@
 {
   "node": {
-    "00fefd142c261688b99ae7b76db415179e65b3f072": {
+    "006e5c04b932aa58409b970d730722245426b97fe6": {
       "workers": {
         "app/profile/page": {
           "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "005bdfabf3c23b8cfed3bbf207af846c5140202bcb": {
+    "00b0ddb25df88773f9a749fcd628911771a6a895a1": {
       "workers": {
         "app/profile/page": {
           "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "0040d8c7f8a94a6361a81cc1ffb51dcce1ccee4e0c": {
+    "005e692aa538657431ff46944cbeecd587b17044a1": {
       "workers": {
         "app/profile/page": {
           "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -36,7 +36,7 @@
       "exportedName": "getUnreadMessageCount",
       "filename": "lib/data/messages.ts"
     },
-    "001f1794894712a2c92f6bd83a11176a9ada98a084": {
+    "00124c01b2dca0a16bf32608e1eb52010de6ae05af": {
       "workers": {
         "app/profile/page": {
           "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
