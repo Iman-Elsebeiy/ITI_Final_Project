@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 
 export async function login(formData: { email: string; password: string }) {
@@ -13,6 +14,12 @@ export async function login(formData: { email: string; password: string }) {
     });
 
     if (error) {
+      if (error.message === "Invalid login credentials") {
+        return { error: "Invalid email or password. If you don't have an account, please sign up first." };
+      }
+      if (error.message === "Email not confirmed") {
+        return { error: "Please check your email and confirm your account before signing in." };
+      }
       return { error: error.message };
     }
 
@@ -41,6 +48,7 @@ export async function signup(formData: {
           university: formData.university,
           faculty: formData.faculty,
         },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000"}/auth/callback?next=/setup`,
       },
     });
 
@@ -48,8 +56,32 @@ export async function signup(formData: {
       return { error: error.message };
     }
 
+    if (!data.user) {
+      return { error: "Signup failed. Please try again." };
+    }
+
     if (data.user && !data.session) {
       return { success: true, needsVerification: true };
+    }
+
+    const userId = data.user.id;
+    const admin = createAdminClient();
+
+    const { data: existingProfile } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("id", userId)
+      .single();
+
+    if (!existingProfile) {
+      await admin.from("profiles").insert({
+        id: userId,
+        email: formData.email,
+        full_name: formData.fullName,
+        university: formData.university,
+        faculty: formData.faculty,
+      });
+      await admin.from("user_settings").upsert({ id: userId });
     }
 
     return { success: true };

@@ -1,0 +1,77 @@
+{
+  "node": {
+    "0071f71052422a186e79ee0d4da9acf6c86b91b394": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/auth/actions.ts"
+    },
+    "00ac25d9214bc95595d405af8bb795d8e62ecc129b": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCurrentProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getCurrentProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "007efa07433b2ccc881fe7b84a62c0d64cbfe8915e": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUnreadMessageCount",
+          "filename": "lib/data/messages.ts"
+        }
+      },
+      "exportedName": "getUnreadMessageCount",
+      "filename": "lib/data/messages.ts"
+    },
+    "402f3c8e3301e50af01c4c09a068a6c063c27856b0": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "updateProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00714222c388bb928e8b9c1f861b1061452169e7b3": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserSettings",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getUserSettings",
+      "filename": "lib/data/profile.ts"
+    },
+    "40a1207ab14040089962e4122ae195062ace2a6203": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateUserSettings",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "updateUserSettings",
+      "filename": "lib/data/profile.ts"
+    }
+  },
+  "edge": {}
+}

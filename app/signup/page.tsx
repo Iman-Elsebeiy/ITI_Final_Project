@@ -68,6 +68,8 @@ export default function SignUpPage() {
 
   const password = watch("password");
 
+  const [verificationSent, setVerificationSent] = useState(false);
+
   const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
     setAuthError(null);
@@ -87,6 +89,12 @@ export default function SignUpPage() {
     }
 
     setIsLoading(false);
+
+    if (result.needsVerification) {
+      setVerificationSent(true);
+      return;
+    }
+
     router.push("/setup");
   };
 
@@ -115,7 +123,23 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        {/* Sign Up Card */}
+        {verificationSent ? (
+          <div className="bg-white rounded-3xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-[#1DA5A6]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-[#1DA5A6]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">Check Your Email</h3>
+            <p className="text-[#2C2C2C]/60 mb-6">
+              We sent a confirmation link to your email. Please click the link to verify your account, then sign in.
+            </p>
+            <Link
+              href="/login"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              Go to Sign In
+            </Link>
+          </div>
+        ) : (
         <div className="bg-white rounded-3xl shadow-lg p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {authError && (
@@ -479,6 +503,7 @@ export default function SignUpPage() {
             </Link>
           </p>
         </div>
+        )}
       </div>
     </div>
   );
