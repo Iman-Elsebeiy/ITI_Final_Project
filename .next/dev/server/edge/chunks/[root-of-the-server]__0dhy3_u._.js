@@ -53,7 +53,7 @@ async function updateSession(request) {
         "/support",
         "/auth/callback"
     ];
-    const isPublicPath = publicPaths.some((path)=>request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith("/auth/"));
+    const isPublicPath = publicPaths.some((path)=>request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith("/auth/")) || request.nextUrl.pathname.startsWith("/api/");
     if (!user && !isPublicPath) {
         const url = request.nextUrl.clone();
         url.pathname = "/login";
