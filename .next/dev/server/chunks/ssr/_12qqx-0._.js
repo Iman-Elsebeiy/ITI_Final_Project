@@ -57,7 +57,7 @@ function createAdminClient() {
 "[project]/app/auth/actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"0043dd663e5c85be8367a5a3cb2dcaf85b508ee53f":{"name":"logout"},"4071d67ca3b388e844fc782e55821bba343f200d28":{"name":"resetPassword"},"407e180bb86b767bdc1292d804558bd05f53e9fa4a":{"name":"signup"},"4099407448ddf5c0135c00995b00ae90134bd0cc6a":{"name":"forgotPassword"},"40d702eae0875c76727d75e337e04bb62aab759c93":{"name":"login"}},"app/auth/actions.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"00ff901baa416f83ad46fec1069c84be40aac11832":{"name":"logout"},"404d84586342c44881f97777916b14c07bb08eab85":{"name":"login"},"404f7488d61110d6e67ed5e19fdec5c1a329996bda":{"name":"forgotPassword"},"407c8e590234f9ca63fbb14ecbd8a90acc179ab513":{"name":"resetPassword"},"4090ff40ab8154927a28ee11379f201abca81b8f49":{"name":"signup"}},"app/auth/actions.ts",""] */ __turbopack_context__.s([
     "forgotPassword",
     ()=>forgotPassword,
     "login",
@@ -101,8 +101,21 @@ async function login(formData) {
                 error: error.message
             };
         }
+        // Check role to determine redirect
+        const { data: { user: loggedInUser } } = await supabase.auth.getUser();
+        if (loggedInUser) {
+            const admin = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$admin$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createAdminClient"])();
+            const { data: profile } = await admin.from("profiles").select("role").eq("id", loggedInUser.id).single();
+            if (profile?.role === "admin") {
+                return {
+                    success: true,
+                    redirect: "/admin"
+                };
+            }
+        }
         return {
-            success: true
+            success: true,
+            redirect: "/home"
         };
     } catch  {
         return {
@@ -238,16 +251,16 @@ async function resetPassword(password) {
     forgotPassword,
     resetPassword
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(login, "40d702eae0875c76727d75e337e04bb62aab759c93", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(signup, "407e180bb86b767bdc1292d804558bd05f53e9fa4a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(logout, "0043dd663e5c85be8367a5a3cb2dcaf85b508ee53f", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(forgotPassword, "4099407448ddf5c0135c00995b00ae90134bd0cc6a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(resetPassword, "4071d67ca3b388e844fc782e55821bba343f200d28", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(login, "404d84586342c44881f97777916b14c07bb08eab85", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(signup, "4090ff40ab8154927a28ee11379f201abca81b8f49", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(logout, "00ff901baa416f83ad46fec1069c84be40aac11832", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(forgotPassword, "404f7488d61110d6e67ed5e19fdec5c1a329996bda", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(resetPassword, "407c8e590234f9ca63fbb14ecbd8a90acc179ab513", null);
 }),
 "[project]/lib/data/profile.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"001a9e2c21663e7fec7f018cbb9488f765d0df2444":{"name":"getCurrentProfile"},"00e33f72d7875f1d25e41911615f2c81414d498e6b":{"name":"getUserSettings"},"400f36de195d9332555baa3bcb268e92ca0a64c28f":{"name":"updateUserSettings"},"4055edb2307c098bc19a66a78c233cb416ead047ae":{"name":"getProfileById"},"40a54614036b0bb69bc5de9a8eeac8d94c073f96ac":{"name":"updateProfile"}},"lib/data/profile.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0048ae489926e3a24b8886ada921d85e8c891f9241":{"name":"getCurrentProfile"},"0096d85143ce6b536ed0c0eb802d7189794c332521":{"name":"getUserSettings"},"4013943290be5f6b37fb733f310c763f5e894f8e14":{"name":"getProfileById"},"4077b0e53d850fc370d52cc053476441264207f27c":{"name":"updateUserSettings"},"4091f7006a471054f5ab463581e9bb0a30d55eeff5":{"name":"updateProfile"}},"lib/data/profile.ts",""] */ __turbopack_context__.s([
     "getCurrentProfile",
     ()=>getCurrentProfile,
     "getProfileById",
@@ -346,16 +359,16 @@ async function updateUserSettings(updates) {
     getUserSettings,
     updateUserSettings
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCurrentProfile, "001a9e2c21663e7fec7f018cbb9488f765d0df2444", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProfileById, "4055edb2307c098bc19a66a78c233cb416ead047ae", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateProfile, "40a54614036b0bb69bc5de9a8eeac8d94c073f96ac", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserSettings, "00e33f72d7875f1d25e41911615f2c81414d498e6b", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateUserSettings, "400f36de195d9332555baa3bcb268e92ca0a64c28f", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCurrentProfile, "0048ae489926e3a24b8886ada921d85e8c891f9241", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProfileById, "4013943290be5f6b37fb733f310c763f5e894f8e14", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateProfile, "4091f7006a471054f5ab463581e9bb0a30d55eeff5", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserSettings, "0096d85143ce6b536ed0c0eb802d7189794c332521", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateUserSettings, "4077b0e53d850fc370d52cc053476441264207f27c", null);
 }),
 "[project]/lib/data/messages.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"006869c1e4c4461cca952bc1069a2ad82f7f0fd78f":{"name":"getConversations"},"00f9dbc30402ebbf7c8ad9138e4ccc7df99c6b0986":{"name":"getUnreadMessageCount"},"401e72c560b1d168072947d57703ea88b7a3d0b060":{"name":"getMessages"},"60e90555d2a0159a360f109cff5a258203d51269e9":{"name":"sendMessage"}},"lib/data/messages.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0054b2de15d18c7224a40e8c5ae2425f034f129bb4":{"name":"getUnreadMessageCount"},"0082001bb76c2c286e7e9604e49b19d13a7ede305f":{"name":"getConversations"},"40cd8b7c16a05bdecb8c521eb1e688874da7d83df7":{"name":"getMessages"},"609807fe49dd249c21d5a0432c9b6f400b0042b618":{"name":"sendMessage"}},"lib/data/messages.ts",""] */ __turbopack_context__.s([
     "getConversations",
     ()=>getConversations,
     "getMessages",
@@ -481,15 +494,15 @@ async function getUnreadMessageCount() {
     sendMessage,
     getUnreadMessageCount
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getConversations, "006869c1e4c4461cca952bc1069a2ad82f7f0fd78f", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getMessages, "401e72c560b1d168072947d57703ea88b7a3d0b060", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(sendMessage, "60e90555d2a0159a360f109cff5a258203d51269e9", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUnreadMessageCount, "00f9dbc30402ebbf7c8ad9138e4ccc7df99c6b0986", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getConversations, "0082001bb76c2c286e7e9604e49b19d13a7ede305f", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getMessages, "40cd8b7c16a05bdecb8c521eb1e688874da7d83df7", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(sendMessage, "609807fe49dd249c21d5a0432c9b6f400b0042b618", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUnreadMessageCount, "0054b2de15d18c7224a40e8c5ae2425f034f129bb4", null);
 }),
 "[project]/lib/data/items.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"0065c1ca4cbf00a41d790687300c88b314da645b81":{"name":"getUserItems"},"0088d9c0e828523d8f85f5e3ffad7bbf6242c624aa":{"name":"getItemCount"},"403df9d4a7ab8bb1c6dddf7b5caf798725ac3bec02":{"name":"getItemById"},"40a6f78745802180b811588c1916866cc009e10d52":{"name":"getItems"},"40a8ac71f1bf38aa11913c093c80f5776706878396":{"name":"deleteItem"},"40e63c3a2121826021f9e7064345ae96ed7160b976":{"name":"uploadItemImage"},"40f8095252cfa38ae1f617b06a4d655974f6d3906a":{"name":"createItem"},"607fb50e7b31d1d289e92cd84027fe87aa19a9c530":{"name":"updateItem"}},"lib/data/items.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"000567890a68b834ca452cdc8db9a13cc0008d299b":{"name":"getUserItems"},"00e7eebc5de8da7f5b5203950467e00a99039c47ef":{"name":"getItemCount"},"4021fba15ac005f2636e07fa591cce60724581f384":{"name":"createItem"},"402db3a3be30facd09428c679f0002d391c0f5f08f":{"name":"uploadItemImage"},"408322b8e3e0f69a041be4ef5d296508e256d17c51":{"name":"deleteItem"},"408a73527f502ac0fe7a02f98dc87148db383be968":{"name":"getItems"},"4093d1ac602eb8b3d19fe77d5852c7e2c2bbe7968a":{"name":"getItemById"},"60d8b9ebf134f68598dd0c5bdc33585fe6be6b5ebb":{"name":"updateItem"}},"lib/data/items.ts",""] */ __turbopack_context__.s([
     "createItem",
     ()=>createItem,
     "deleteItem",
@@ -702,19 +715,19 @@ async function getItemCount() {
     deleteItem,
     getItemCount
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(uploadItemImage, "40e63c3a2121826021f9e7064345ae96ed7160b976", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItems, "40a6f78745802180b811588c1916866cc009e10d52", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItemById, "403df9d4a7ab8bb1c6dddf7b5caf798725ac3bec02", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserItems, "0065c1ca4cbf00a41d790687300c88b314da645b81", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createItem, "40f8095252cfa38ae1f617b06a4d655974f6d3906a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateItem, "607fb50e7b31d1d289e92cd84027fe87aa19a9c530", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteItem, "40a8ac71f1bf38aa11913c093c80f5776706878396", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItemCount, "0088d9c0e828523d8f85f5e3ffad7bbf6242c624aa", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(uploadItemImage, "402db3a3be30facd09428c679f0002d391c0f5f08f", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItems, "408a73527f502ac0fe7a02f98dc87148db383be968", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItemById, "4093d1ac602eb8b3d19fe77d5852c7e2c2bbe7968a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserItems, "000567890a68b834ca452cdc8db9a13cc0008d299b", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createItem, "4021fba15ac005f2636e07fa591cce60724581f384", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateItem, "60d8b9ebf134f68598dd0c5bdc33585fe6be6b5ebb", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteItem, "408322b8e3e0f69a041be4ef5d296508e256d17c51", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getItemCount, "00e7eebc5de8da7f5b5203950467e00a99039c47ef", null);
 }),
 "[project]/lib/data/rentals.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"0019e795102eaf22d57ff99e9f05048a123f2c715c":{"name":"getRentalHistory"},"0021d352164f1581d01e7b57d4aa03e3736d43791a":{"name":"getRentalStats"},"400f531bd653acd3506c1e66b5506e2c9560f7189a":{"name":"createRental"},"408ce28053cecbfca0c66a9edbfdd9f390fa8f4126":{"name":"getUserRentals"},"607ec934d67801e1d382e1c27977711c2b6aa3d1f6":{"name":"updateRentalStatus"}},"lib/data/rentals.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0079092cfb6549fd631ff2113edbcb4424a39e3914":{"name":"getRentalHistory"},"00ddb28daa9c2fe6c3d8ace36ece0596c0f1a0929e":{"name":"getRentalStats"},"4038a21458c14d083000d67887a4ae4686bbe43135":{"name":"getUserRentals"},"4079eb766eb6dc0b171bb8611c7815f42812a56536":{"name":"createRental"},"60cb75ffd3b9e69cc31a5ecb7dcbb9af9ad401eb56":{"name":"updateRentalStatus"}},"lib/data/rentals.ts",""] */ __turbopack_context__.s([
     "createRental",
     ()=>createRental,
     "getRentalHistory",
@@ -875,16 +888,16 @@ async function getRentalStats() {
     updateRentalStatus,
     getRentalStats
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserRentals, "408ce28053cecbfca0c66a9edbfdd9f390fa8f4126", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRentalHistory, "0019e795102eaf22d57ff99e9f05048a123f2c715c", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRental, "400f531bd653acd3506c1e66b5506e2c9560f7189a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateRentalStatus, "607ec934d67801e1d382e1c27977711c2b6aa3d1f6", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRentalStats, "0021d352164f1581d01e7b57d4aa03e3736d43791a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserRentals, "4038a21458c14d083000d67887a4ae4686bbe43135", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRentalHistory, "0079092cfb6549fd631ff2113edbcb4424a39e3914", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRental, "4079eb766eb6dc0b171bb8611c7815f42812a56536", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateRentalStatus, "60cb75ffd3b9e69cc31a5ecb7dcbb9af9ad401eb56", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRentalStats, "00ddb28daa9c2fe6c3d8ace36ece0596c0f1a0929e", null);
 }),
 "[project]/lib/data/notifications.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"00be4b70e46ba421567fd1231056b0180bcbfc4c64":{"name":"getUnreadNotificationCount"},"00f0adbbee338187d31f4819a8fe54389691124221":{"name":"getNotifications"},"401c722090e32f6a5155936d45c3c338bfc71b239e":{"name":"markNotificationRead"}},"lib/data/notifications.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"006a7bceb4e4ccac61a7702180efc47f3bf7a3b0a8":{"name":"getUnreadNotificationCount"},"008bde42c74b8a0e87cb765972728d634258fb8217":{"name":"getNotifications"},"4088b4507baf21bd22a97cdba07881d734e4554d47":{"name":"markNotificationRead"}},"lib/data/notifications.ts",""] */ __turbopack_context__.s([
     "getNotifications",
     ()=>getNotifications,
     "getUnreadNotificationCount",
@@ -948,9 +961,9 @@ async function getUnreadNotificationCount() {
     markNotificationRead,
     getUnreadNotificationCount
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getNotifications, "00f0adbbee338187d31f4819a8fe54389691124221", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(markNotificationRead, "401c722090e32f6a5155936d45c3c338bfc71b239e", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUnreadNotificationCount, "00be4b70e46ba421567fd1231056b0180bcbfc4c64", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getNotifications, "008bde42c74b8a0e87cb765972728d634258fb8217", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(markNotificationRead, "4088b4507baf21bd22a97cdba07881d734e4554d47", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUnreadNotificationCount, "006a7bceb4e4ccac61a7702180efc47f3bf7a3b0a8", null);
 }),
 "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
@@ -973,17 +986,17 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$notifications
 "use strict";
 
 __turbopack_context__.s([
-    "001a9e2c21663e7fec7f018cbb9488f765d0df2444",
+    "0048ae489926e3a24b8886ada921d85e8c891f9241",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$profile$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCurrentProfile"],
-    "0021d352164f1581d01e7b57d4aa03e3736d43791a",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$rentals$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRentalStats"],
-    "0043dd663e5c85be8367a5a3cb2dcaf85b508ee53f",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["logout"],
-    "00f0adbbee338187d31f4819a8fe54389691124221",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$notifications$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getNotifications"],
-    "00f9dbc30402ebbf7c8ad9138e4ccc7df99c6b0986",
+    "0054b2de15d18c7224a40e8c5ae2425f034f129bb4",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$messages$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUnreadMessageCount"],
-    "40a6f78745802180b811588c1916866cc009e10d52",
+    "008bde42c74b8a0e87cb765972728d634258fb8217",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$notifications$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getNotifications"],
+    "00ddb28daa9c2fe6c3d8ace36ece0596c0f1a0929e",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$rentals$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRentalStats"],
+    "00ff901baa416f83ad46fec1069c84be40aac11832",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$auth$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["logout"],
+    "408a73527f502ac0fe7a02f98dc87148db383be968",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2f$items$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getItems"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$home$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$app$2f$auth$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$lib$2f$data$2f$profile$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE2__$3d3e$__$225b$project$5d2f$lib$2f$data$2f$messages$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE3__$3d3e$__$225b$project$5d2f$lib$2f$data$2f$items$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE4__$3d3e$__$225b$project$5d2f$lib$2f$data$2f$rentals$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE5__$3d3e$__$225b$project$5d2f$lib$2f$data$2f$notifications$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => "[project]/app/auth/actions.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/lib/data/profile.ts [app-rsc] (ecmascript)", ACTIONS_MODULE2 => "[project]/lib/data/messages.ts [app-rsc] (ecmascript)", ACTIONS_MODULE3 => "[project]/lib/data/items.ts [app-rsc] (ecmascript)", ACTIONS_MODULE4 => "[project]/lib/data/rentals.ts [app-rsc] (ecmascript)", ACTIONS_MODULE5 => "[project]/lib/data/notifications.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');

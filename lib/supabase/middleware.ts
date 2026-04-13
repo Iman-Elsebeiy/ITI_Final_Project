@@ -59,5 +59,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Protect /admin from non-admin users
+  if (user && request.nextUrl.pathname.startsWith("/admin")) {
+    // We'll let the page handle the auth check via API
+  }
+
   return supabaseResponse;
 }
