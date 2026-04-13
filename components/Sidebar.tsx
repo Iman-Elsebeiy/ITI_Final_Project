@@ -18,6 +18,7 @@ import {
   Heart,
   History,
 } from "lucide-react";
+import { logout } from "@/app/auth/actions";
 
 const menuItems = [
   {
@@ -73,9 +74,8 @@ export default function Sidebar() {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    // Add logout logic here
-    router.push("/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

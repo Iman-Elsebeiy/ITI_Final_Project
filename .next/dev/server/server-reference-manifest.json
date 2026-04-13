@@ -1,5 +1,36 @@
 {
-  "node": {},
+  "node": {
+    "006f5d69363622d0292e430c6419d53023a538f874": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        },
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "filename": "app/auth/actions.ts",
+      "exportedName": "logout"
+    },
+    "4066dff65d15f608a2949c4285cd3e13c13fadb0ea": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "login",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "filename": "app/auth/actions.ts",
+      "exportedName": "login"
+    }
+  },
   "edge": {},
-  "encryptionKey": "3db8se808wIhUtUaTxwVo6Ob6ngzw1gyg8bzmJ35wZ4="
+  "encryptionKey": "Zie+fzahbuGjihoY8i9x/MJAS5SuVftRw31QoDlR6ZU="
 }

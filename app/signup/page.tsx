@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
+import { signup } from "@/app/auth/actions";
 
 type SignUpFormData = {
   fullName: string;
@@ -56,6 +57,7 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     register,
@@ -68,9 +70,22 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Sign up data:", data);
+    setAuthError(null);
+
+    const result = await signup({
+      email: data.email,
+      password: data.password,
+      fullName: data.fullName,
+      university: data.university,
+      faculty: data.faculty,
+    });
+
+    if (result.error) {
+      setAuthError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(false);
     router.push("/setup");
   };
@@ -103,6 +118,11 @@ export default function SignUpPage() {
         {/* Sign Up Card */}
         <div className="bg-white rounded-3xl shadow-lg p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {authError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                {authError}
+              </div>
+            )}
             {/* Full Name */}
             <div>
               <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, UserCircle, Shield } from "lucide-react";
+import { login } from "@/app/auth/actions";
 
 type LoginFormData = {
   email: string;
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [userRole, setUserRole] = useState<"student" | "admin">("student");
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     register,
@@ -26,10 +28,19 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Login data:", { ...data, role: userRole });
-    setIsLoading(false);
+    setAuthError(null);
+
+    const result = await login({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (result.error) {
+      setAuthError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
     router.push("/home");
   };
 
@@ -89,6 +100,11 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {authError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                {authError}
+              </div>
+            )}
             {/* Email Field */}
             <div>
               <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">

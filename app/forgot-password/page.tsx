@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Send,
 } from "lucide-react";
+import { forgotPassword, resetPassword } from "@/app/auth/actions";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -34,6 +35,7 @@ export default function ForgotPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [resendTimer, setResendTimer] = useState(60);
 
@@ -52,11 +54,18 @@ export default function ForgotPasswordPage() {
 
   const password = watch("password");
 
-  // Step 1: Send verification email
   const onSubmitEmail = async (data: ForgotPasswordFormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setAuthError(null);
+
+    const result = await forgotPassword(data.email);
+
+    if (result.error) {
+      setAuthError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
     setEmail(data.email);
     setIsLoading(false);
     setStep(2);
@@ -76,12 +85,18 @@ export default function ForgotPasswordPage() {
     setStep(3);
   };
 
-  // Step 3: Reset password
   const onSubmitPassword = async (data: ResetPasswordFormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Password reset successful");
+    setAuthError(null);
+
+    const result = await resetPassword(data.password);
+
+    if (result.error) {
+      setAuthError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(false);
     router.push("/login");
   };
