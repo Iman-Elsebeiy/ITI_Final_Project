@@ -1,0 +1,203 @@
+You are working inside my existing Next.js App Router TypeScript project.
+
+⚠️ CRITICAL RULES:
+
+* DO NOT delete or rewrite the project
+* DO NOT change folder structure
+* DO NOT recreate the app
+* DO NOT modify UI or styling
+* KEEP all existing frontend code exactly as it is
+
+Your job is ONLY to connect the existing frontend to Supabase.
+
+---
+
+## ENV VARIABLES
+
+Use these:
+
+NEXT_PUBLIC_SUPABASE_URL = https://tshspojyzvcjzwvjmlhk.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = sb_publishable_Mo-TK0EusbTq8bTJT-QBmQ_tzpFQ6nZ
+
+SUPABASE_SERVICE_ROLE_KEY = (read from env only, never expose to client)
+
+NEXT_PUBLIC_APP_URL = http://localhost:3000
+
+SUPABASE_ITEM_IMAGES_BUCKET = item-images
+SUPABASE_STUDENT_IDS_BUCKET = student-ids
+SUPABASE_AVATARS_BUCKET = avatars
+
+---
+
+## TASK OVERVIEW
+
+You must transform the app from mock/static data to real Supabase backend WITHOUT touching UI.
+
+---
+
+## STEP 1: Setup Supabase
+
+* Install Supabase packages
+
+* Create:
+
+  * browser client
+  * server client
+  * admin client (server-only)
+
+* Ensure:
+
+  * service role key is NEVER exposed
+  * env variables are validated
+
+---
+
+## STEP 2: Authentication
+
+Connect existing pages:
+
+* login
+* signup
+* forgot-password
+
+Implement:
+
+* real login using Supabase Auth
+* real signup (create auth user + profile)
+* logout (destroy session)
+
+DO NOT change UI, only logic.
+
+---
+
+## STEP 3: Route Protection
+
+* Protect all internal routes
+* Redirect unauthenticated users → /login
+* Prevent logged-in users from going back to login/signup
+
+---
+
+## STEP 4: Database
+
+Create tables:
+
+* profiles
+* items
+* item_images
+* favorites
+* rentals
+* messages
+* categories
+* universities
+* user_settings
+
+Requirements:
+
+* UUID ids
+* linked to auth.users
+* timestamps
+* proper relations
+
+---
+
+## STEP 5: Replace Mock Data
+
+Scan project and find all:
+
+* static users
+* static items
+* static messages
+* static favorites
+
+Replace them with Supabase queries.
+
+DO NOT TOUCH UI.
+
+---
+
+## STEP 6: Storage
+
+Connect file uploads:
+
+* item images
+* student ID
+* avatars
+
+Upload to Supabase Storage and save URLs in DB.
+
+---
+
+## STEP 7: Seed Existing Users (IMPORTANT)
+
+* Extract static users from code
+* Create real Supabase users using admin API
+* Generate passwords automatically
+
+Save to local file:
+seed-output.local.json
+
+Example:
+[
+{
+"name": "Ahmed Hassan",
+"email": "[ahmed@demo.local](mailto:ahmed@demo.local)",
+"password": "Test123456"
+}
+]
+
+IMPORTANT:
+
+* Do NOT store passwords in database
+* Only output them in local file
+* Add file to .gitignore
+
+---
+
+## STEP 8: Seed Items
+
+* Insert existing items into DB
+* Link them to users
+
+---
+
+## STEP 9: RLS
+
+* Enable RLS on all tables
+* Users can only access their own data
+
+---
+
+## STEP 10: Connect Pages
+
+Update logic ONLY:
+
+* home → fetch data
+* browse → fetch/filter
+* list-item → insert
+* messages → fetch/send
+* favorites → save/remove
+* profile → load/update
+* settings → persist
+
+---
+
+## STEP 11: Final Output
+
+Provide:
+
+1. summary of changes
+2. DB schema
+3. env variables list
+4. run commands
+5. seeded users + passwords
+
+---
+
+## FINAL INSTRUCTION
+
+Start with authentication ONLY (login + signup).
+
+Do NOT touch other pages yet.
+
+Then wait for my confirmation before continuing.
