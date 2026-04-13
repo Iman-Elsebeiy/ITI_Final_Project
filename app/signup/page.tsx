@@ -15,6 +15,7 @@ import {
   Upload,
   CheckCircle2,
   X,
+  AlertCircle,
 } from "lucide-react";
 
 type SignUpFormData = {
@@ -56,28 +57,111 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [error, setError] = useState("");
+  const [fileError, setFileError] = useState("");
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
+    setValue,
   } = useForm<SignUpFormData>();
 
   const password = watch("password");
 
-  const onSubmit = async (data: SignUpFormData) => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Sign up data:", data);
-    setIsLoading(false);
-    router.push("/setup");
+  const validateFile = (file: File): string | null => {
+    // Check file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
+    if (!allowedTypes.includes(file.type)) {
+      return "Only JPG, PNG, or PDF files are allowed";
+    }
+
+    // Check file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      return "File size must be less than 5MB";
+    }
+
+    return null;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError("");
+    
     if (e.target.files && e.target.files[0]) {
-      setUploadedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Validate file
+      const validationError = validateFile(file);
+      if (validationError) {
+        setFileError(validationError);
+        setUploadedFile(null);
+        setValue("studentId", null as any);
+        return;
+      }
+      
+      setUploadedFile(file);
+    }
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setFileError("");
+    setValue("studentId", null as any);
+  };
+
+  const onSubmit = async (data: SignUpFormData) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Get existing users from localStorage
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+
+      // Check if email already exists
+      const emailExists = users.some((u: any) => u.email === data.email);
+      if (emailExists) {
+        throw new Error("This email is already registered");
+      }
+
+      // Check if Student ID was uploaded
+      if (!uploadedFile) {
+        throw new Error("Please upload your Student ID");
+      }
+
+      // Create new user object
+      const newUser = {
+        id: Date.now().toString(),
+        fullName: data.fullName,
+        email: data.email,
+        university: data.university,
+        faculty: data.faculty,
+        password: data.password, // ⚠️ في الـ production هيتشفر!
+        studentIdFile: uploadedFile.name, // في الـ production هيترفع للـ server
+        isVerified: false, // needs admin approval
+        role: "user",
+        createdAt: new Date().toISOString(),
+      };
+
+      // Save to localStorage
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      // Save current user session
+      localStorage.setItem("pendingUser", JSON.stringify(newUser));
+
+      // Redirect to setup/verification page
+      router.push("/setup");
+      
+    } catch (err: any) {
+      console.error("Sign up error:", err);
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,20 +172,39 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <Link href="/login" className="inline-block mb-4">
             <h1 className="text-4xl font-extrabold">
-              <span className="text-[#1DA5A6]">Uni</span>
-              <span className="text-[#2C2C2C]">Tool</span>
+              <span className="text-[#1DA5A6]">Share</span>
+              <span className="text-[#2C2C2C]">Hub</span>
             </h1>
           </Link>
           <h2 className="text-2xl font-bold text-[#2C2C2C] mb-2">
             Create Your Account
           </h2>
           <p className="text-[#2C2C2C]/60 text-sm">
-            Join the student marketplace community
+            Join the community and start sharing
           </p>
         </div>
 
         {/* Sign Up Card */}
         <div className="bg-white rounded-3xl shadow-lg p-8">
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-900 mb-1">
+                  Registration Failed
+                </h4>
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+              <button
+                onClick={() => setError("")}
+                className="text-red-400 hover:text-red-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Full Name */}
             <div>
@@ -118,9 +221,14 @@ export default function SignUpPage() {
                       value: 3,
                       message: "Name must be at least 3 characters",
                     },
+                    pattern: {
+                      value: /^[a-zA-Z\s]+$/,
+                      message: "Name can only contain letters",
+                    },
                   })}
                   placeholder="Ahmed Mohamed"
-                  className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all ${
+                  disabled={isLoading}
+                  className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     errors.fullName
                       ? "ring-2 ring-red-500"
                       : "focus:ring-[#1DA5A6]/30"
@@ -134,10 +242,10 @@ export default function SignUpPage() {
               )}
             </div>
 
-            {/* University Email */}
+            {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">
-                University Email <span className="text-red-500">*</span>
+                Email Address <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
@@ -150,8 +258,9 @@ export default function SignUpPage() {
                       message: "Invalid email address",
                     },
                   })}
-                  placeholder="ahmed.mohamed@university.edu"
-                  className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all ${
+                  placeholder="you@example.com"
+                  disabled={isLoading}
+                  className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     errors.email
                       ? "ring-2 ring-red-500"
                       : "focus:ring-[#1DA5A6]/30"
@@ -165,7 +274,7 @@ export default function SignUpPage() {
               )}
             </div>
 
-            {/* University & Faculty (2 columns) */}
+            {/* University & Faculty */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* University */}
               <div>
@@ -173,12 +282,13 @@ export default function SignUpPage() {
                   University <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
+                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40 pointer-events-none" />
                   <select
                     {...register("university", {
                       required: "University is required",
                     })}
-                    className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer ${
+                    disabled={isLoading}
+                    className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer disabled:opacity-50 ${
                       errors.university
                         ? "ring-2 ring-red-500"
                         : "focus:ring-[#1DA5A6]/30"
@@ -205,12 +315,13 @@ export default function SignUpPage() {
                   Faculty <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
+                  <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40 pointer-events-none" />
                   <select
                     {...register("faculty", {
                       required: "Faculty is required",
                     })}
-                    className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer ${
+                    disabled={isLoading}
+                    className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer disabled:opacity-50 ${
                       errors.faculty
                         ? "ring-2 ring-red-500"
                         : "focus:ring-[#1DA5A6]/30"
@@ -235,14 +346,18 @@ export default function SignUpPage() {
             {/* Student ID Upload */}
             <div>
               <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">
-                Student ID (Karnay) <span className="text-red-500">*</span>
+                Student ID <span className="text-red-500">*</span>
               </label>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
                   uploadedFile
                     ? "border-[#1DA5A6] bg-[#1DA5A6]/5"
                     : "border-[#2C2C2C]/20 hover:border-[#1DA5A6]/50"
-                } ${errors.studentId ? "border-red-500" : ""}`}
+                } ${
+                  errors.studentId || fileError
+                    ? "border-red-500 bg-red-50"
+                    : ""
+                }`}
               >
                 <input
                   type="file"
@@ -250,8 +365,9 @@ export default function SignUpPage() {
                     required: "Student ID is required",
                   })}
                   onChange={handleFileChange}
-                  accept="image/*,.pdf"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  accept="image/jpeg,image/png,image/jpg,application/pdf"
+                  disabled={isLoading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
                 {uploadedFile ? (
                   <div className="flex items-center justify-between">
@@ -260,7 +376,7 @@ export default function SignUpPage() {
                         <CheckCircle2 className="w-6 h-6 text-[#1DA5A6]" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#2C2C2C]">
+                        <p className="text-sm font-semibold text-[#2C2C2C] line-clamp-1">
                           {uploadedFile.name}
                         </p>
                         <p className="text-xs text-[#2C2C2C]/60">
@@ -270,8 +386,9 @@ export default function SignUpPage() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setUploadedFile(null)}
-                      className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors"
+                      onClick={removeFile}
+                      disabled={isLoading}
+                      className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors disabled:opacity-50"
                     >
                       <X className="w-4 h-4 text-red-500" />
                     </button>
@@ -283,19 +400,19 @@ export default function SignUpPage() {
                       Upload Student ID
                     </p>
                     <p className="text-xs text-[#2C2C2C]/60">
-                      PNG, JPG or PDF (max. 5MB)
+                      JPG, PNG or PDF (max. 5MB)
                     </p>
                   </div>
                 )}
               </div>
-              {errors.studentId && (
+              {(errors.studentId || fileError) && (
                 <p className="text-red-500 text-xs mt-1.5 ml-1">
-                  {errors.studentId.message}
+                  {errors.studentId?.message || fileError}
                 </p>
               )}
             </div>
 
-            {/* Password Fields (2 columns) */}
+            {/* Password Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Password */}
               <div>
@@ -312,9 +429,14 @@ export default function SignUpPage() {
                         value: 8,
                         message: "Password must be at least 8 characters",
                       },
+                      pattern: {
+                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                        message: "Password must contain uppercase, lowercase, and number",
+                      },
                     })}
                     placeholder="Create password"
-                    className={`w-full h-14 pl-12 pr-12 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all ${
+                    disabled={isLoading}
+                    className={`w-full h-14 pl-12 pr-12 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       errors.password
                         ? "ring-2 ring-red-500"
                         : "focus:ring-[#1DA5A6]/30"
@@ -323,7 +445,8 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60 transition-colors"
+                    disabled={isLoading}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60 transition-colors disabled:opacity-50"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -354,7 +477,8 @@ export default function SignUpPage() {
                         value === password || "Passwords do not match",
                     })}
                     placeholder="Confirm password"
-                    className={`w-full h-14 pl-12 pr-12 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all ${
+                    disabled={isLoading}
+                    className={`w-full h-14 pl-12 pr-12 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       errors.confirmPassword
                         ? "ring-2 ring-red-500"
                         : "focus:ring-[#1DA5A6]/30"
@@ -363,7 +487,8 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60 transition-colors"
+                    disabled={isLoading}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60 transition-colors disabled:opacity-50"
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -387,10 +512,11 @@ export default function SignUpPage() {
                 {...register("agreeToTerms", {
                   required: "You must agree to the terms",
                 })}
-                className="w-5 h-5 mt-0.5 rounded border-2 border-[#2C2C2C]/20 text-[#1DA5A6] focus:ring-2 focus:ring-[#1DA5A6]/30 cursor-pointer"
+                disabled={isLoading}
+                className="w-5 h-5 mt-0.5 rounded border-2 border-[#2C2C2C]/20 text-[#1DA5A6] focus:ring-2 focus:ring-[#1DA5A6]/30 cursor-pointer disabled:opacity-50"
               />
               <label className="text-sm text-[#2C2C2C]/70 leading-relaxed">
-                I agree to UniTool's{" "}
+                I agree to ShareHub's{" "}
                 <Link
                   href="/terms"
                   className="text-[#1DA5A6] font-semibold hover:underline"
