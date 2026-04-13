@@ -32,3 +32,12 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+NEXT_PUBLIC_SUPABASE_URL = "https://tshspojyzvcjzwvjmlhk.supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Mo-TK0EusbTq8bTJT-QBmQ_tzpFQ6nZ"
+SUPABASE_ITEM_IMAGES_BUCKET = "item-images"
+SUPABASE_STUDENT_IDS_BUCKET = "student-ids"
+SUPABASE_AVATARS_BUCKET = "avatars"
