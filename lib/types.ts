@@ -2,17 +2,11 @@ export type Profile = {
   id: string;
   full_name: string | null;
   email: string | null;
-  phone: string | null;
   university: string | null;
-  major: string | null;
   faculty: string | null;
-  bio: string | null;
-  location: string | null;
   role: "borrower" | "lender" | "both";
+  student_id_path: string | null;
   avatar_url: string | null;
-  student_id_url: string | null;
-  is_verified: boolean;
-  is_setup_complete: boolean;
   created_at: string;
   updated_at: string;
 };

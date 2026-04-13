@@ -82,9 +82,8 @@ export default function SetupPage() {
 
     const result = await updateProfile({
       university: data.university,
-      major: data.major,
+      faculty: data.major,
       role: data.role,
-      is_setup_complete: true,
     });
 
     setIsSubmitting(false);

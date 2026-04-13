@@ -6,17 +6,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT,
   email TEXT,
-  phone TEXT,
   university TEXT,
-  major TEXT,
   faculty TEXT,
-  bio TEXT,
-  location TEXT,
   role TEXT DEFAULT 'both' CHECK (role IN ('borrower', 'lender', 'both')),
+  student_id_path TEXT,
   avatar_url TEXT,
-  student_id_url TEXT,
-  is_verified BOOLEAN DEFAULT FALSE,
-  is_setup_complete BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

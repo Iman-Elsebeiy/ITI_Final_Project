@@ -34,11 +34,8 @@ export default function SettingsPage() {
   const [profileData, setProfileData] = useState({
     fullName: "",
     email: "",
-    phone: "",
     university: "",
-    major: "",
-    bio: "",
-    location: "",
+    faculty: "",
   });
 
   const [notifications, setNotifications] = useState({
@@ -75,11 +72,8 @@ export default function SettingsPage() {
         setProfileData({
           fullName: profile.full_name || "",
           email: profile.email || "",
-          phone: profile.phone || "",
           university: profile.university || "",
-          major: profile.major || profile.faculty || "",
-          bio: profile.bio || "",
-          location: profile.location || "",
+          faculty: profile.faculty || "",
         });
       }
 
@@ -119,11 +113,8 @@ export default function SettingsPage() {
     if (activeTab === "profile") {
       result = await updateProfile({
         full_name: profileData.fullName,
-        phone: profileData.phone,
         university: profileData.university,
-        major: profileData.major,
-        bio: profileData.bio,
-        location: profileData.location,
+        faculty: profileData.faculty,
       });
     } else if (activeTab === "notifications") {
       result = await updateUserSettings({
@@ -263,24 +254,6 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Phone</label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
-                      <input type="tel" value={profileData.phone}
-                        onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                        className="w-full h-12 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Location</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
-                      <input type="text" value={profileData.location}
-                        onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
-                        className="w-full h-12 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
-                    </div>
-                  </div>
-                  <div>
                     <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">University</label>
                     <div className="relative">
                       <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
@@ -290,22 +263,14 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Major</label>
+                    <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Faculty</label>
                     <div className="relative">
                       <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
-                      <input type="text" value={profileData.major}
-                        onChange={(e) => setProfileData({ ...profileData, major: e.target.value })}
+                      <input type="text" value={profileData.faculty}
+                        onChange={(e) => setProfileData({ ...profileData, faculty: e.target.value })}
                         className="w-full h-12 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Bio</label>
-                  <textarea value={profileData.bio}
-                    onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                    rows={4} className="w-full px-4 py-3 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30 resize-none"
-                    placeholder="Tell others about yourself..." />
                 </div>
               </div>
             )}

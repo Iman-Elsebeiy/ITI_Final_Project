@@ -77,12 +77,7 @@ export default function ProfilePage() {
             <div className="text-white">
               <h2 className="text-2xl font-bold">{profile.full_name || "No name set"}</h2>
               <p className="opacity-90">{profile.university || "No university set"}</p>
-              <p className="opacity-75 text-sm mt-1">{profile.major || profile.faculty || ""}</p>
-              {profile.is_verified && (
-                <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">
-                  <Star className="w-3 h-3" />Verified Student
-                </span>
-              )}
+              <p className="opacity-75 text-sm mt-1">{profile.faculty || ""}</p>
             </div>
           </div>
         </div>
@@ -107,13 +102,6 @@ export default function ProfilePage() {
         </div>
 
         <div className="p-6 space-y-4">
-          {profile.bio && (
-            <div>
-              <h3 className="text-sm font-semibold text-[#2C2C2C]/60 mb-2">Bio</h3>
-              <p className="text-[#2C2C2C]">{profile.bio}</p>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-4 bg-[#F1F3F5] rounded-xl">
               <Mail className="w-5 h-5 text-[#1DA5A6]" />
@@ -133,14 +121,14 @@ export default function ProfilePage() {
               <GraduationCap className="w-5 h-5 text-[#1DA5A6]" />
               <div>
                 <p className="text-xs text-[#2C2C2C]/60">Major</p>
-                <p className="text-sm font-semibold text-[#2C2C2C]">{profile.major || profile.faculty || "Not set"}</p>
+                <p className="text-sm font-semibold text-[#2C2C2C]">{profile.faculty || "Not set"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-[#F1F3F5] rounded-xl">
               <MapPin className="w-5 h-5 text-[#1DA5A6]" />
               <div>
-                <p className="text-xs text-[#2C2C2C]/60">Location</p>
-                <p className="text-sm font-semibold text-[#2C2C2C]">{profile.location || "Not set"}</p>
+                <p className="text-xs text-[#2C2C2C]/60">Faculty</p>
+                <p className="text-sm font-semibold text-[#2C2C2C]">{profile.faculty || "Not set"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-[#F1F3F5] rounded-xl">
