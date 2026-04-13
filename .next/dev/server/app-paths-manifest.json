@@ -5,5 +5,6 @@
   "/api/admin/users/route": "app/api/admin/users/route.js",
   "/home/page": "app/home/page.js",
   "/login/page": "app/login/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js"
 }
