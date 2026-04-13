@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import {
   User,
   Mail,
-  Phone,
-  MapPin,
   Building2,
+  AlertCircle,
   GraduationCap,
   Lock,
   Bell,
@@ -29,6 +28,7 @@ export default function SettingsPage() {
   >("profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [profileData, setProfileData] = useState({
@@ -144,6 +144,8 @@ export default function SettingsPage() {
     setIsSaving(false);
 
     if (result?.error) {
+      setSaveError(result.error);
+      setTimeout(() => setSaveError(""), 5000);
       return;
     }
 
@@ -186,6 +188,13 @@ export default function SettingsPage() {
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-green-500" />
           <p className="text-sm font-semibold text-green-900">Settings saved successfully!</p>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500" />
+          <p className="text-sm font-semibold text-red-900">{saveError}</p>
         </div>
       )}
 

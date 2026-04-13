@@ -79,8 +79,7 @@ export async function updateUserSettings(updates: Partial<UserSettings>) {
 
     const { error } = await supabase
       .from("user_settings")
-      .update(updates)
-      .eq("id", user.id);
+      .upsert({ id: user.id, ...updates });
 
     if (error) return { error: error.message };
     return { success: true };

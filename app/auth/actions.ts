@@ -53,6 +53,9 @@ export async function signup(formData: {
     });
 
     if (error) {
+      if (error.message?.includes("already registered")) {
+        return { error: "This email is already registered. Please sign in instead." };
+      }
       return { error: error.message };
     }
 
@@ -76,14 +79,21 @@ export async function signup(formData: {
       .single();
 
     if (!existingProfile) {
-      await admin.from("profiles").insert({
+      const { error: profileError } = await admin.from("profiles").insert({
         id: userId,
         email: formData.email,
         full_name: formData.fullName,
         university: formData.university,
         faculty: formData.faculty,
       });
-      await admin.from("user_settings").upsert({ id: userId });
+      if (profileError) {
+        console.error("Profile insert error:", profileError);
+        return { error: "Failed to create profile. Please try again." };
+      }
+      const { error: settingsError } = await admin.from("user_settings").upsert({ id: userId });
+      if (settingsError) {
+        console.error("Settings insert error:", settingsError);
+      }
     }
 
     if (!data.session) {

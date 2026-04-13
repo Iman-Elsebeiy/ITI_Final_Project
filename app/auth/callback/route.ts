@@ -25,14 +25,20 @@ export async function GET(request: Request) {
 
         if (!existingProfile) {
           const meta = data.user.user_metadata || {};
-          await admin.from("profiles").insert({
+          const { error: profileError } = await admin.from("profiles").insert({
             id: data.user.id,
             email: data.user.email || "",
             full_name: meta.full_name || "",
             university: meta.university || "",
             faculty: meta.faculty || "",
           });
-          await admin.from("user_settings").upsert({ id: data.user.id });
+          if (profileError) {
+            console.error("Callback profile insert error:", profileError);
+          }
+          const { error: settingsError } = await admin.from("user_settings").upsert({ id: data.user.id });
+          if (settingsError) {
+            console.error("Callback settings upsert error:", settingsError);
+          }
         }
 
         return NextResponse.redirect(`${origin}${next}`);
