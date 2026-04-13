@@ -43,7 +43,7 @@ export default function WelcomePage() {
   ];
 
   const nextSteps = [
-    { title: "Complete Your Profile", description: "Add a photo and bio", action: "Go to Profile", path: "/profile" },
+    { title: "Complete Your Profile", description: "Add a photo and details", action: "Go to Profile", path: "/profile" },
     { title: "Browse Available Items", description: "See what others are offering", action: "Start Browsing", path: "/browse" },
     { title: "List Your First Item", description: "Share and start earning", action: "List Item", path: "/list-item" },
   ];
@@ -71,7 +71,7 @@ export default function WelcomePage() {
             <div className="text-left">
               <p className="font-bold text-[#2C2C2C]">{profile?.full_name || "Student"}</p>
               <p className="text-sm text-[#2C2C2C]/60">
-                {[profile?.university, profile?.major].filter(Boolean).join(" \u2022 ") || "Complete your profile"}
+                {[profile?.university, profile?.faculty].filter(Boolean).join(" \u2022 ") || "Complete your profile"}
               </p>
             </div>
             <CheckCircle2 className="w-6 h-6 text-green-500" />
