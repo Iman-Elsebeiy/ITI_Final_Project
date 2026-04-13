@@ -60,12 +60,14 @@ export async function signup(formData: {
       return { error: "Signup failed. Please try again." };
     }
 
-    if (data.user && !data.session) {
-      return { success: true, needsVerification: true };
-    }
-
     const userId = data.user.id;
     const admin = createAdminClient();
+
+    if (!data.session) {
+      await admin.auth.admin.updateUserById(userId, {
+        email_confirm: true,
+      });
+    }
 
     const { data: existingProfile } = await admin
       .from("profiles")
@@ -82,6 +84,16 @@ export async function signup(formData: {
         faculty: formData.faculty,
       });
       await admin.from("user_settings").upsert({ id: userId });
+    }
+
+    if (!data.session) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (signInError) {
+        return { error: signInError.message };
+      }
     }
 
     return { success: true };
