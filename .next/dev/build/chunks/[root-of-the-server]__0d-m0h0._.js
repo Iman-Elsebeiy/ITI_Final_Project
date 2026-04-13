@@ -24,12 +24,21 @@ __turbopack_context__.s([
     "default",
     ()=>__TURBOPACK__default__export__
 ]);
-const config = {
-    plugins: {
-        "@tailwindcss/postcss": {}
-    }
+const fixTailwindMaskUrls = ()=>({
+        postcssPlugin: "postcss-fix-tailwind-mask-urls",
+        Declaration (decl) {
+            if (decl.prop === "mask-image" && decl.value === "url(...)") {
+                decl.parent.remove();
+            }
+        }
+    });
+fixTailwindMaskUrls.postcss = true;
+const __TURBOPACK__default__export__ = {
+    plugins: [
+        "@tailwindcss/postcss",
+        fixTailwindMaskUrls
+    ]
 };
-const __TURBOPACK__default__export__ = config;
 }),
 "[turbopack-node]/transforms/transforms.ts [postcss] (ecmascript)", ((__turbopack_context__) => {
 "use strict";

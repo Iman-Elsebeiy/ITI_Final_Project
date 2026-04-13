@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: ["*.spock.replit.dev", "*.replit.dev"],
 };
 
 export default nextConfig;
