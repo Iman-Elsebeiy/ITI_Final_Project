@@ -1,6 +1,6 @@
 {
   "node": {
-    "006e5c04b932aa58409b970d730722245426b97fe6": {
+    "00f48a3c9095773c08091a9f62b8f97b9fbb319b57": {
       "workers": {
         "app/terms/page": {
           "moduleId": "[project]/.next-internal/server/app/terms/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "00b0ddb25df88773f9a749fcd628911771a6a895a1": {
+    "0010bea0eb5a9693d834e2873c34c655fc237756de": {
       "workers": {
         "app/terms/page": {
           "moduleId": "[project]/.next-internal/server/app/terms/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "005e692aa538657431ff46944cbeecd587b17044a1": {
+    "00047218c77546baeab1afd841ac75a28b958cf726": {
       "workers": {
         "app/terms/page": {
           "moduleId": "[project]/.next-internal/server/app/terms/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
