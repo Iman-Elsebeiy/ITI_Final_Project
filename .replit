@@ -42,3 +42,8 @@ SUPABASE_ITEM_IMAGES_BUCKET = "item-images"
 SUPABASE_STUDENT_IDS_BUCKET = "student-ids"
 SUPABASE_AVATARS_BUCKET = "avatars"
 SUPABASE_SERVICE_ROLE_KEY = "sb_secret_Z6aoiPFkN09HTgsxX07yHw_LMfVrGO-"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]
