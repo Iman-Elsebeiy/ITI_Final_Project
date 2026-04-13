@@ -751,12 +751,19 @@ async function getUserFavorites() {
             ascending: false
         });
         if (!data) return [];
-        return data.filter((f)=>f.item).map((f)=>({
-                ...f.item,
-                favorite_id: f.id,
-                added_at: f.created_at,
-                is_favorite: true
-            }));
+        const results = [];
+        for (const f of data){
+            const item = Array.isArray(f.item) ? f.item[0] : f.item;
+            if (item) {
+                results.push({
+                    ...item,
+                    favorite_id: f.id,
+                    added_at: f.created_at,
+                    is_favorite: true
+                });
+            }
+        }
+        return results;
     } catch  {
         return [];
     }

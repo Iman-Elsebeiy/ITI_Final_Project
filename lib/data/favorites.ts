@@ -24,14 +24,14 @@ export async function getUserFavorites(): Promise<(Item & { favorite_id: string;
 
     if (!data) return [];
 
-    return data
-      .filter((f: { item: Item | null }) => f.item)
-      .map((f: { id: string; created_at: string; item: Item }) => ({
-        ...f.item,
-        favorite_id: f.id,
-        added_at: f.created_at,
-        is_favorite: true,
-      }));
+    const results: (Item & { favorite_id: string; added_at: string })[] = [];
+    for (const f of data) {
+      const item = Array.isArray(f.item) ? f.item[0] : f.item;
+      if (item) {
+        results.push({ ...(item as Item), favorite_id: f.id, added_at: f.created_at, is_favorite: true });
+      }
+    }
+    return results;
   } catch {
     return [];
   }

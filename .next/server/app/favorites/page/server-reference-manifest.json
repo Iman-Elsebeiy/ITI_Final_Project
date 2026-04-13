@@ -1,6 +1,6 @@
 {
   "node": {
-    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+    "007219de051faeeb467a0c3947b087e8fd6ab1bdea": {
       "workers": {
         "app/favorites/page": {
           "moduleId": 66170,
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+    "003b1e75765455caaed4a31cb33238ba5a0e9fbc70": {
       "workers": {
         "app/favorites/page": {
           "moduleId": 66170,
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+    "00834783751a717b2f32b68f999322581d31170ecd": {
       "workers": {
         "app/favorites/page": {
           "moduleId": 66170,
@@ -36,7 +36,7 @@
       "exportedName": "getUnreadMessageCount",
       "filename": "lib/data/messages.ts"
     },
-    "00ef1708f34eb4512e329ce1592d8654c96a59956e": {
+    "00c66d89942bc6d7d781a993969ffb2c393e587870": {
       "workers": {
         "app/favorites/page": {
           "moduleId": 66170,
@@ -48,7 +48,7 @@
       "exportedName": "getUserFavorites",
       "filename": "lib/data/favorites.ts"
     },
-    "402071a3456a5164a55d68dd8bc3fed7d33e3307b0": {
+    "4085f1fec1f1ac794b6aecd7f11048e19d91954228": {
       "workers": {
         "app/favorites/page": {
           "moduleId": 66170,

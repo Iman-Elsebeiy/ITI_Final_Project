@@ -1,6 +1,6 @@
 {
   "node": {
-    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+    "007219de051faeeb467a0c3947b087e8fd6ab1bdea": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+    "003b1e75765455caaed4a31cb33238ba5a0e9fbc70": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+    "00834783751a717b2f32b68f999322581d31170ecd": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
@@ -36,7 +36,7 @@
       "exportedName": "getUnreadMessageCount",
       "filename": "lib/data/messages.ts"
     },
-    "40668a5f001b709db58aedb1dc736f193527bb5883": {
+    "404252e328c01de55b2b8e81edf9b67bb4bcc37330": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
@@ -48,7 +48,7 @@
       "exportedName": "updateProfile",
       "filename": "lib/data/profile.ts"
     },
-    "00dec938ccd01b9c1302497e40d845a7d6d09f76c0": {
+    "002ec09a4539733de99d757942e63e30820a37f83b": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
@@ -60,7 +60,7 @@
       "exportedName": "getUserSettings",
       "filename": "lib/data/profile.ts"
     },
-    "40a48b5dfed334d39d03fefb47b55b8733c6019254": {
+    "4050e2bcf8ab3bfc20aff31a92ede0e9202f16f32a": {
       "workers": {
         "app/settings/page": {
           "moduleId": 27552,
