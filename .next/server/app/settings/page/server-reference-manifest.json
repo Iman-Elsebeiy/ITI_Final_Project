@@ -1,0 +1,77 @@
+{
+  "node": {
+    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/auth/actions.ts"
+    },
+    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "getCurrentProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getCurrentProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "getUnreadMessageCount",
+          "filename": "lib/data/messages.ts"
+        }
+      },
+      "exportedName": "getUnreadMessageCount",
+      "filename": "lib/data/messages.ts"
+    },
+    "40668a5f001b709db58aedb1dc736f193527bb5883": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "updateProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "updateProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00dec938ccd01b9c1302497e40d845a7d6d09f76c0": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "getUserSettings",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getUserSettings",
+      "filename": "lib/data/profile.ts"
+    },
+    "40a48b5dfed334d39d03fefb47b55b8733c6019254": {
+      "workers": {
+        "app/settings/page": {
+          "moduleId": 27552,
+          "async": false,
+          "exportedName": "updateUserSettings",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "updateUserSettings",
+      "filename": "lib/data/profile.ts"
+    }
+  },
+  "edge": {}
+}

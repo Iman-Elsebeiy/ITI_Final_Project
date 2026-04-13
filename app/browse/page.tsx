@@ -188,7 +188,7 @@ export default function BrowsePage() {
             const owner = item.owner as unknown as Profile;
             const ownerName = owner?.full_name || "Unknown";
             const ownerInitials = ownerName.split(" ").map((n) => n[0]).join("").toUpperCase();
-            const imageUrl = item.images?.[0] || "https://via.placeholder.com/300?text=No+Image";
+            const imageUrl = item.image_paths?.[0] || "https://via.placeholder.com/300?text=No+Image";
 
             return (
               <div
@@ -231,7 +231,7 @@ export default function BrowsePage() {
                   <div className="flex items-center justify-between pt-3 border-t border-[#2C2C2C]/10">
                     <div>
                       <p className="text-2xl font-bold text-[#1DA5A6]">EGP {item.price}</p>
-                      <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.period] || item.period}</p>
+                      <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-[#1DA5A6] to-[#194774] rounded-full flex items-center justify-center text-white text-xs font-bold">

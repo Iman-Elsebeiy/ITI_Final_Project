@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS public.items (
   description TEXT,
   category TEXT NOT NULL,
   price NUMERIC(10,2) NOT NULL,
-  period TEXT NOT NULL CHECK (period IN ('hourly', 'daily', 'weekly', 'monthly', 'semester')),
+  rental_period TEXT NOT NULL CHECK (rental_period IN ('hourly', 'daily', 'weekly', 'monthly', 'semester')),
   condition TEXT NOT NULL CHECK (condition IN ('new', 'like-new', 'excellent', 'good', 'fair')),
   location TEXT,
   deposit NUMERIC(10,2) DEFAULT 0,
   available BOOLEAN DEFAULT TRUE,
-  images TEXT[] DEFAULT '{}',
-  available_from DATE,
+  image_paths TEXT[] DEFAULT '{}',
+  availability_date DATE NOT NULL DEFAULT CURRENT_DATE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -254,6 +254,26 @@ CREATE POLICY "System can create notifications" ON public.notifications FOR INSE
 CREATE POLICY "Users can view own settings" ON public.user_settings FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own settings" ON public.user_settings FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own settings" ON public.user_settings FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- ===== STORAGE BUCKET & POLICIES =====
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('item-images', 'item-images', true, 10485760, ARRAY['image/png','image/jpeg','image/gif','image/webp','image/svg+xml'])
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Authenticated users can upload item images"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'item-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Anyone can view item images"
+  ON storage.objects FOR SELECT
+  TO public
+  USING (bucket_id = 'item-images');
+
+CREATE POLICY "Users can delete own item images"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'item-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 -- ===== VIEWS for computed data =====
 CREATE OR REPLACE VIEW public.item_stats AS

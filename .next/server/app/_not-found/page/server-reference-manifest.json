@@ -1,0 +1,41 @@
+{
+  "node": {
+    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 77116,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/auth/actions.ts"
+    },
+    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 77116,
+          "async": false,
+          "exportedName": "getCurrentProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getCurrentProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 77116,
+          "async": false,
+          "exportedName": "getUnreadMessageCount",
+          "filename": "lib/data/messages.ts"
+        }
+      },
+      "exportedName": "getUnreadMessageCount",
+      "filename": "lib/data/messages.ts"
+    }
+  },
+  "edge": {}
+}

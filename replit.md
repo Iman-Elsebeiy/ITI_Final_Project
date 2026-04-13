@@ -27,6 +27,7 @@ A Next.js 16 application migrated from Vercel to Replit with Supabase backend.
   - `messages.ts` - Conversations, messages, unread count
   - `notifications.ts` - Notifications, mark read
 - `supabase/schema.sql` - Full database schema (10 tables, RLS policies, triggers)
+- `scripts/` - Seed scripts (fix-and-seed.ts for sample items + storage images)
 - `middleware.ts` - Route protection middleware
 - `public/` - Static assets
 
@@ -34,9 +35,19 @@ A Next.js 16 application migrated from Vercel to Replit with Supabase backend.
 
 Tables: `profiles`, `items`, `rentals`, `favorites`, `conversations`, `conversation_participants`, `messages`, `reviews`, `notifications`, `user_settings`
 
+**Items table columns**: `id`, `owner_id`, `title`, `description`, `category`, `condition`, `price`, `rental_period`, `availability_date`, `location`, `deposit`, `image_paths` (TEXT[]), `available`, `created_at`, `updated_at`
+
 All tables have RLS policies. Triggers auto-create profiles and user_settings on signup, and update `updated_at` timestamps.
 
 **Setup**: Run `supabase/schema.sql` in Supabase SQL Editor to create all tables.
+
+## Supabase Storage
+
+- **Bucket**: `item-images` (public, 10MB limit, allows png/jpeg/gif/webp/svg+xml)
+- Images uploaded via `uploadItemImage()` server action in `lib/data/items.ts`
+- Public URLs stored in `items.image_paths` array
+- Seed images at `seed/item-{1..12}.svg` in the bucket
+- Run `npx tsx scripts/fix-and-seed.ts` to seed 12 sample items with storage images
 
 ## Data Architecture
 

@@ -17,7 +17,7 @@ export async function getUserRentals(options?: {
       .from("rentals")
       .select(`
         *,
-        item:items(id, title, images, category),
+        item:items(id, title, image_paths, category),
         borrower:profiles!borrower_id(id, full_name, avatar_url),
         lender:profiles!lender_id(id, full_name, avatar_url)
       `)
@@ -56,7 +56,7 @@ export async function getRentalHistory(): Promise<Rental[]> {
       .from("rentals")
       .select(`
         *,
-        item:items(id, title, images, category),
+        item:items(id, title, image_paths, category),
         borrower:profiles!borrower_id(id, full_name, avatar_url),
         lender:profiles!lender_id(id, full_name, avatar_url)
       `)

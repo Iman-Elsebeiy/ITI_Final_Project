@@ -1,0 +1,89 @@
+{
+  "node": {
+    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/auth/actions.ts"
+    },
+    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "getCurrentProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getCurrentProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "getUnreadMessageCount",
+          "filename": "lib/data/messages.ts"
+        }
+      },
+      "exportedName": "getUnreadMessageCount",
+      "filename": "lib/data/messages.ts"
+    },
+    "403919df85f56fdf05ec5bc8f78f519f9aad1904e7": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "getItems",
+          "filename": "lib/data/items.ts"
+        }
+      },
+      "exportedName": "getItems",
+      "filename": "lib/data/items.ts"
+    },
+    "00e88adca25df407d5f4bb311fcc4d7537a30d27fc": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "getItemCount",
+          "filename": "lib/data/items.ts"
+        }
+      },
+      "exportedName": "getItemCount",
+      "filename": "lib/data/items.ts"
+    },
+    "402071a3456a5164a55d68dd8bc3fed7d33e3307b0": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "toggleFavorite",
+          "filename": "lib/data/favorites.ts"
+        }
+      },
+      "exportedName": "toggleFavorite",
+      "filename": "lib/data/favorites.ts"
+    },
+    "004698c52187270ca61bc8a934cd49aaea515e39b0": {
+      "workers": {
+        "app/browse/page": {
+          "moduleId": 70315,
+          "async": false,
+          "exportedName": "getFavoriteCount",
+          "filename": "lib/data/favorites.ts"
+        }
+      },
+      "exportedName": "getFavoriteCount",
+      "filename": "lib/data/favorites.ts"
+    }
+  },
+  "edge": {}
+}

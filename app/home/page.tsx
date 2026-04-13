@@ -188,7 +188,7 @@ export default function HomePage() {
                 const ownerName = (item.owner as unknown as Profile)?.full_name || "Unknown";
                 const ownerUni = (item.owner as unknown as Profile)?.university || "";
                 const ownerInitials = ownerName.split(" ").map((n) => n[0]).join("").toUpperCase();
-                const imageUrl = item.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
+                const imageUrl = item.image_paths?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
 
                 return (
                   <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
@@ -226,7 +226,7 @@ export default function HomePage() {
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-[#1DA5A6]">EGP {item.price}</p>
-                          <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.period] || item.period}</p>
+                          <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
                         </div>
                       </div>
                     </div>

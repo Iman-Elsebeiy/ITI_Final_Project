@@ -16,7 +16,7 @@ import {
   Image as ImageIcon,
   ArrowLeft,
 } from "lucide-react";
-import { createItem } from "@/lib/data/items";
+import { createItem, uploadItemImage } from "@/lib/data/items";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/types";
 
 type ListItemFormData = {
@@ -69,16 +69,32 @@ export default function ListItemPage() {
     setIsSubmitting(true);
     setSubmitError("");
 
+    const imageUrls: string[] = [];
+    for (const file of uploadedImages) {
+      const fd = new FormData();
+      fd.append("file", file);
+      const uploadResult = await uploadItemImage(fd);
+      if (uploadResult.error) {
+        setIsSubmitting(false);
+        setSubmitError(`Image upload failed: ${uploadResult.error}`);
+        return;
+      }
+      if (uploadResult.url) {
+        imageUrls.push(uploadResult.url);
+      }
+    }
+
     const result = await createItem({
       title: data.title,
       description: data.description,
       category: data.category,
       price: Number(data.price),
-      period: data.rentalPeriod as "hourly" | "daily" | "weekly" | "monthly" | "semester",
+      rental_period: data.rentalPeriod as "hourly" | "daily" | "weekly" | "monthly" | "semester",
       condition: data.condition,
       location: data.location,
       deposit: data.deposit ? Number(data.deposit) : 0,
-      available_from: data.availability || undefined,
+      availability_date: data.availability || undefined,
+      image_paths: imageUrls.length > 0 ? imageUrls : undefined,
     });
 
     setIsSubmitting(false);

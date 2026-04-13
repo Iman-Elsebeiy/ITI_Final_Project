@@ -147,7 +147,7 @@ export default function RentalsPage() {
             const otherUser = rental._type === "borrowed"
               ? (rental.lender as unknown as Profile)
               : (rental.borrower as unknown as Profile);
-            const imageUrl = item?.images?.[0] || "https://via.placeholder.com/150?text=Item";
+            const imageUrl = item?.image_paths?.[0] || "https://via.placeholder.com/150?text=Item";
 
             return (
               <div key={rental.id} className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all overflow-hidden">

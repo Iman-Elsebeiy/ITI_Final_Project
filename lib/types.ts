@@ -24,13 +24,13 @@ export type Item = {
   description: string | null;
   category: string;
   price: number;
-  period: "hourly" | "daily" | "weekly" | "monthly" | "semester";
+  rental_period: "hourly" | "daily" | "weekly" | "monthly" | "semester";
   condition: "new" | "like-new" | "excellent" | "good" | "fair";
   location: string | null;
   deposit: number;
   available: boolean;
-  images: string[];
-  available_from: string | null;
+  image_paths: string[];
+  availability_date: string | null;
   created_at: string;
   updated_at: string;
   owner?: Profile;

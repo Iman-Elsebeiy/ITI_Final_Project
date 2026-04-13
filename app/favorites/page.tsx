@@ -110,7 +110,7 @@ export default function FavoritesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((item) => {
             const owner = item.owner as unknown as Profile;
-            const imageUrl = item.images?.[0] || "https://via.placeholder.com/300?text=No+Image";
+            const imageUrl = item.image_paths?.[0] || "https://via.placeholder.com/300?text=No+Image";
 
             return (
               <div key={item.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden">
@@ -145,7 +145,7 @@ export default function FavoritesPage() {
                   <div className="flex items-center justify-between pt-4 border-t border-[#2C2C2C]/10">
                     <div>
                       <p className="text-2xl font-bold text-[#1DA5A6]">EGP {item.price}</p>
-                      <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.period] || item.period}</p>
+                      <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
                     </div>
                     <button onClick={() => router.push(`/browse`)} disabled={!item.available}
                       className="px-4 py-2 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">

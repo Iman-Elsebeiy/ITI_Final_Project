@@ -1,0 +1,65 @@
+{
+  "node": {
+    "0085d93cf1dfad03a105e0ae7ab5a7dcedd8f70195": {
+      "workers": {
+        "app/favorites/page": {
+          "moduleId": 66170,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/auth/actions.ts"
+    },
+    "0007922dee8c7511584e3be5750bcdb6f229b35e81": {
+      "workers": {
+        "app/favorites/page": {
+          "moduleId": 66170,
+          "async": false,
+          "exportedName": "getCurrentProfile",
+          "filename": "lib/data/profile.ts"
+        }
+      },
+      "exportedName": "getCurrentProfile",
+      "filename": "lib/data/profile.ts"
+    },
+    "00080b2a1c87dbeb336c96da5c44b3ec8134092139": {
+      "workers": {
+        "app/favorites/page": {
+          "moduleId": 66170,
+          "async": false,
+          "exportedName": "getUnreadMessageCount",
+          "filename": "lib/data/messages.ts"
+        }
+      },
+      "exportedName": "getUnreadMessageCount",
+      "filename": "lib/data/messages.ts"
+    },
+    "00ef1708f34eb4512e329ce1592d8654c96a59956e": {
+      "workers": {
+        "app/favorites/page": {
+          "moduleId": 66170,
+          "async": false,
+          "exportedName": "getUserFavorites",
+          "filename": "lib/data/favorites.ts"
+        }
+      },
+      "exportedName": "getUserFavorites",
+      "filename": "lib/data/favorites.ts"
+    },
+    "402071a3456a5164a55d68dd8bc3fed7d33e3307b0": {
+      "workers": {
+        "app/favorites/page": {
+          "moduleId": 66170,
+          "async": false,
+          "exportedName": "toggleFavorite",
+          "filename": "lib/data/favorites.ts"
+        }
+      },
+      "exportedName": "toggleFavorite",
+      "filename": "lib/data/favorites.ts"
+    }
+  },
+  "edge": {}
+}

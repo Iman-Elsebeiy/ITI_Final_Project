@@ -3,6 +3,33 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Item } from "@/lib/types";
 
+const BUCKET_NAME = "item-images";
+
+export async function uploadItemImage(formData: FormData): Promise<{ url?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+
+    const file = formData.get("file") as File;
+    if (!file) return { error: "No file provided" };
+
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(fileName, file, { contentType: file.type, upsert: false });
+
+    if (uploadError) return { error: uploadError.message };
+
+    const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+    return { url: urlData.publicUrl };
+  } catch {
+    return { error: "Upload failed" };
+  }
+}
+
 export async function getItems(options?: {
   category?: string;
   search?: string;
@@ -99,12 +126,12 @@ export async function createItem(itemData: {
   description?: string;
   category: string;
   price: number;
-  period: string;
+  rental_period: string;
   condition: string;
   location?: string;
   deposit?: number;
-  available_from?: string;
-  images?: string[];
+  availability_date?: string;
+  image_paths?: string[];
 }) {
   try {
     const supabase = await createClient();

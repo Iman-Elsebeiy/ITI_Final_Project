@@ -152,7 +152,7 @@ export default function HistoryPage() {
             const otherUser = rental._type === "borrowed"
               ? (rental.lender as unknown as Profile)
               : (rental.borrower as unknown as Profile);
-            const imageUrl = item?.images?.[0] || "https://via.placeholder.com/100?text=Item";
+            const imageUrl = item?.image_paths?.[0] || "https://via.placeholder.com/100?text=Item";
 
             return (
               <div key={rental.id} className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all">
