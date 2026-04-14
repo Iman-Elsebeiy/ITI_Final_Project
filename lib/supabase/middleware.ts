@@ -40,11 +40,12 @@ export async function updateSession(request: NextRequest) {
     "/auth/callback",
   ];
 
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      request.nextUrl.pathname === path ||
-      request.nextUrl.pathname.startsWith("/auth/")
-  );
+  const isPublicPath =
+    publicPaths.some(
+      (path) =>
+        request.nextUrl.pathname === path ||
+        request.nextUrl.pathname.startsWith("/auth/")
+    ) || request.nextUrl.pathname.startsWith("/api/");
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
@@ -56,6 +57,11 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/home";
     return NextResponse.redirect(url);
+  }
+
+  // Protect /admin from non-admin users
+  if (user && request.nextUrl.pathname.startsWith("/admin")) {
+    // We'll let the page handle the auth check via API
   }
 
   return supabaseResponse;

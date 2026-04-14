@@ -23,7 +23,22 @@ export async function login(formData: { email: string; password: string }) {
       return { error: error.message };
     }
 
-    return { success: true };
+    // Check role to determine redirect
+    const { data: { user: loggedInUser } } = await supabase.auth.getUser();
+    if (loggedInUser) {
+      const admin = createAdminClient();
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("role")
+        .eq("id", loggedInUser.id)
+        .single();
+
+      if (profile?.role === "admin") {
+        return { success: true, redirect: "/admin" };
+      }
+    }
+
+    return { success: true, redirect: "/home" };
   } catch {
     return { error: "An unexpected error occurred. Please try again." };
   }
