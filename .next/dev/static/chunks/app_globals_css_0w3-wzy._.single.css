@@ -2210,10 +2210,6 @@
     background-color: --color-bg;
   }
 
-  .bg-\[var\(--background\)\] {
-    background-color: var(--background);
-  }
-
   .bg-amber-50 {
     background-color: var(--color-amber-50);
   }

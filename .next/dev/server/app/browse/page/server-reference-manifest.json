@@ -1,6 +1,6 @@
 {
   "node": {
-    "003f96a95d3adab2192fe3397d5f7a5ebcae6c64df": {
+    "009486158921213c4cd0d20e052a3b92dc91c48933": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -12,7 +12,7 @@
       "exportedName": "logout",
       "filename": "app/auth/actions.ts"
     },
-    "0026452ab52c474fb1d6253b23c270770017a37768": {
+    "00145ce6abd92b5400455d959d9384ef2cbb9ac8ac": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -24,7 +24,7 @@
       "exportedName": "getCurrentProfile",
       "filename": "lib/data/profile.ts"
     },
-    "00cba0ef42ea08f99a073b34bd968db683ae24452e": {
+    "00af467afc2530cd2221dc1af54dac0d722868161c": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -36,7 +36,7 @@
       "exportedName": "getUnreadMessageCount",
       "filename": "lib/data/messages.ts"
     },
-    "406eb7982c8b8864f0d104e41a0b221d024b3f2565": {
+    "40b1b3950cece607a355b06d0bb0215a930e635687": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -48,7 +48,7 @@
       "exportedName": "getItems",
       "filename": "lib/data/items.ts"
     },
-    "007060341304da091c4629523d6a7a794fbcf8550d": {
+    "008fab74955cb36faecee4f5c9b812422fa8255548": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -60,7 +60,7 @@
       "exportedName": "getItemCount",
       "filename": "lib/data/items.ts"
     },
-    "4077241100501a132c9644e610005aa8486e7d66a0": {
+    "40ff120db648c55be87c4e8ca329f5d38fd4ab45c1": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -72,7 +72,7 @@
       "exportedName": "toggleFavorite",
       "filename": "lib/data/favorites.ts"
     },
-    "00345e1576e120b70fd092f4c8f4aed160bac0f3b0": {
+    "00d463f5b82b4fdd1a9383cf517c189107aee4586c": {
       "workers": {
         "app/browse/page": {
           "moduleId": "[project]/.next-internal/server/app/browse/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/favorites.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
