@@ -1,19 +1,7 @@
 {
   "node": {
-    "00d415910fd9557fc54683b443fbd18c78e7403031": {
+    "009ac7dcd021dfe4d45fef0f390d67c9cf20f39cc5": {
       "workers": {
-        "app/auth/callback/page": {
-          "moduleId": "[project]/.next-internal/server/app/auth/callback/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "logout",
-          "filename": "app/auth/actions.ts"
-        },
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "logout",
-          "filename": "app/auth/actions.ts"
-        },
         "app/login/page": {
           "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
@@ -22,12 +10,6 @@
         },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "logout",
-          "filename": "app/auth/actions.ts"
-        },
-        "app/profile/page": {
-          "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
           "exportedName": "logout",
           "filename": "app/auth/actions.ts"
@@ -36,20 +18,8 @@
       "filename": "app/auth/actions.ts",
       "exportedName": "logout"
     },
-    "0019da0997ee2a78a5b0ec2e83882890ce9e8fd1e2": {
+    "00c5c772726a49140719ae838ca63414ac2eb6cc91": {
       "workers": {
-        "app/auth/callback/page": {
-          "moduleId": "[project]/.next-internal/server/app/auth/callback/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getCurrentProfile",
-          "filename": "lib/data/profile.ts"
-        },
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getCurrentProfile",
-          "filename": "lib/data/profile.ts"
-        },
         "app/login/page": {
           "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
@@ -58,12 +28,6 @@
         },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getCurrentProfile",
-          "filename": "lib/data/profile.ts"
-        },
-        "app/profile/page": {
-          "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
           "exportedName": "getCurrentProfile",
           "filename": "lib/data/profile.ts"
@@ -72,20 +36,8 @@
       "filename": "lib/data/profile.ts",
       "exportedName": "getCurrentProfile"
     },
-    "00012af59fff4a8dd62493b29e8e6ef6482ad01f66": {
+    "008b7ef05a052e3ee397657efbe86e75fa0c85bf04": {
       "workers": {
-        "app/auth/callback/page": {
-          "moduleId": "[project]/.next-internal/server/app/auth/callback/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getUnreadMessageCount",
-          "filename": "lib/data/messages.ts"
-        },
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getUnreadMessageCount",
-          "filename": "lib/data/messages.ts"
-        },
         "app/login/page": {
           "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
@@ -97,36 +49,12 @@
           "async": false,
           "exportedName": "getUnreadMessageCount",
           "filename": "lib/data/messages.ts"
-        },
-        "app/profile/page": {
-          "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getUnreadMessageCount",
-          "filename": "lib/data/messages.ts"
         }
       },
       "filename": "lib/data/messages.ts",
       "exportedName": "getUnreadMessageCount"
     },
-    "00caa5466481e04e9c06ec4a75836ea449b6fc7b2e": {
-      "workers": {
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getRentalStats",
-          "filename": "lib/data/rentals.ts"
-        },
-        "app/profile/page": {
-          "moduleId": "[project]/.next-internal/server/app/profile/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getRentalStats",
-          "filename": "lib/data/rentals.ts"
-        }
-      },
-      "filename": "lib/data/rentals.ts",
-      "exportedName": "getRentalStats"
-    },
-    "40e0f91df6a95d10ea9440d65dc3edba028307b77a": {
+    "40b6c72200f95a4d674cdc90f72d827a3bf93b4376": {
       "workers": {
         "app/login/page": {
           "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -137,32 +65,8 @@
       },
       "filename": "app/auth/actions.ts",
       "exportedName": "login"
-    },
-    "408376456fcbc901598e686ef8dcc5cf8a0f85cd45": {
-      "workers": {
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getItems",
-          "filename": "lib/data/items.ts"
-        }
-      },
-      "filename": "lib/data/items.ts",
-      "exportedName": "getItems"
-    },
-    "00ae202691a16ffc44cf1a67c98153c0d82f8eb61f": {
-      "workers": {
-        "app/home/page": {
-          "moduleId": "[project]/.next-internal/server/app/home/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/lib/data/items.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/lib/data/rentals.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE5 => \"[project]/lib/data/notifications.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "getNotifications",
-          "filename": "lib/data/notifications.ts"
-        }
-      },
-      "filename": "lib/data/notifications.ts",
-      "exportedName": "getNotifications"
     }
   },
   "edge": {},
-  "encryptionKey": "ZMC+FzqR6HAEMn25xn32a/xS6Js9LYM1Otn4+caWRUA="
+  "encryptionKey": "/WsuLmDyQWKl2YsNvD1EW7TsITIsKXviHpLmWJjKA1E="
 }
