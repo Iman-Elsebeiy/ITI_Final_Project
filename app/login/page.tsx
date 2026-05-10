@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock, UserCircle, Shield } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { login } from "@/app/auth/actions";
 
 type LoginFormData = {
@@ -16,7 +16,6 @@ type LoginFormData = {
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [userRole, setUserRole] = useState<"student" | "admin">("student");
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -58,45 +57,13 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Role Toggle */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm mb-6">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setUserRole("student")}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                userRole === "student"
-                  ? "bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white shadow-md"
-                  : "text-[#2C2C2C]/60 hover:bg-[#F1F3F5]"
-              }`}
-            >
-              <UserCircle className="w-4 h-4" />
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserRole("admin")}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                userRole === "admin"
-                  ? "bg-gradient-to-r from-[#194774] to-[#1DA5A6] text-white shadow-md"
-                  : "text-[#2C2C2C]/60 hover:bg-[#F1F3F5]"
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-              Admin
-            </button>
-          </div>
-        </div>
-
         {/* Login Card */}
         <div className="bg-white rounded-3xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-[#2C2C2C] mb-2">
             Welcome Back
           </h2>
           <p className="text-[#2C2C2C]/60 text-sm mb-6">
-            {userRole === "student"
-              ? "Sign in to access your marketplace"
-              : "Admin portal access"}
+            Sign in to access your marketplace
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -105,10 +72,11 @@ export default function LoginPage() {
                 {authError}
               </div>
             )}
+
             {/* Email Field */}
             <div>
               <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">
-                {userRole === "student" ? "University Email" : "Admin Email"}
+                University Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
@@ -121,11 +89,7 @@ export default function LoginPage() {
                       message: "Invalid email address",
                     },
                   })}
-                  placeholder={
-                    userRole === "student"
-                      ? "student@university.edu"
-                      : "admin@unitool.com"
-                  }
+                  placeholder="student@university.edu"
                   className={`w-full h-14 pl-12 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 transition-all ${
                     errors.email
                       ? "ring-2 ring-red-500"
@@ -238,17 +202,15 @@ export default function LoginPage() {
             </button>
 
             {/* Sign Up Link */}
-            {userRole === "student" && (
-              <p className="text-center text-sm text-[#2C2C2C]/60 mt-6">
-                Don't have an account?{" "}
-                <Link
-                  href="/signup"
-                  className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors"
-                >
-                  Sign Up
-                </Link>
-              </p>
-            )}
+            <p className="text-center text-sm text-[#2C2C2C]/60 mt-6">
+              Don't have an account?{" "}
+              <Link
+                href="/signup"
+                className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors"
+              >
+                Sign Up
+              </Link>
+            </p>
           </form>
         </div>
 
