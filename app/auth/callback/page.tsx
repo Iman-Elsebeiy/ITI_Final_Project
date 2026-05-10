@@ -1,64 +1,71 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const processed = useRef(false);
 
   useEffect(() => {
+    if (processed.current) return;
+    processed.current = true;
+
     const supabase = createClient();
 
-    const handleCallback = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+    const handleAuth = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const next = params.get("next") || "/home";
 
-      if (error || !session) {
-        router.replace("/login?error=auth_failed");
-        return;
-      }
+      if (code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-      const userId = session.user.id;
+        if (error || !data.session) {
+          router.replace("/login?error=auth_failed");
+          return;
+        }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, role, university")
-        .eq("id", userId)
-        .single();
+        const userId = data.session.user.id;
 
-      if (!profile) {
-        const meta = session.user.user_metadata || {};
-        await supabase.from("profiles").insert({
-          id: userId,
-          email: session.user.email || "",
-          full_name: meta.full_name || meta.name || "",
-          university: meta.university || "",
-          faculty: meta.faculty || "",
-        });
-        await supabase.from("user_settings").upsert({ id: userId });
-        router.replace("/setup");
-        return;
-      }
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id, role")
+          .eq("id", userId)
+          .single();
 
-      if (profile.role === "admin") {
-        router.replace("/admin");
-        return;
-      }
+        if (!profile) {
+          const meta = data.session.user.user_metadata || {};
+          await supabase.from("profiles").insert({
+            id: userId,
+            email: data.session.user.email || "",
+            full_name: meta.full_name || meta.name || "",
+            university: "",
+            faculty: "",
+          });
+          await supabase.from("user_settings").upsert({ id: userId });
+          router.replace("/setup");
+          return;
+        }
 
-      router.replace("/home");
-    };
+        if (profile.role === "admin") {
+          router.replace("/admin");
+          return;
+        }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        handleCallback();
-      } else if (event === "INITIAL_SESSION") {
+        router.replace(next);
+      } else {
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          handleCallback();
+          router.replace("/home");
         } else {
           router.replace("/login?error=auth_failed");
         }
       }
-    });
+    };
+
+    handleAuth();
   }, [router]);
 
   return (
