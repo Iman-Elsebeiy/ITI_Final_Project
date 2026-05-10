@@ -16,7 +16,8 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
-import { signup, signInWithGoogle } from "@/app/auth/actions";
+import { signup } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/client";
 
 type SignUpFormData = {
   fullName: string;
@@ -95,16 +96,18 @@ export default function SignUpPage() {
     setIsGoogleLoading(true);
     setAuthError(null);
 
-    const result = await signInWithGoogle();
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/home`,
+        queryParams: { access_type: "offline", prompt: "consent" },
+      },
+    });
 
-    if (result.error) {
-      setAuthError(result.error);
+    if (error) {
+      setAuthError(error.message);
       setIsGoogleLoading(false);
-      return;
-    }
-
-    if (result.url) {
-      window.location.href = result.url;
     }
   };
 

@@ -5,7 +5,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { login, signInWithGoogle } from "@/app/auth/actions";
+import { login } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/client";
 
 type LoginFormData = {
   email: string;
@@ -48,16 +49,18 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     setAuthError(null);
 
-    const result = await signInWithGoogle();
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/home`,
+        queryParams: { access_type: "offline", prompt: "consent" },
+      },
+    });
 
-    if (result.error) {
-      setAuthError(result.error);
+    if (error) {
+      setAuthError(error.message);
       setIsGoogleLoading(false);
-      return;
-    }
-
-    if (result.url) {
-      window.location.href = result.url;
     }
   };
 
