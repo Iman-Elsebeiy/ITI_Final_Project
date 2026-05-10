@@ -92,6 +92,14 @@ export default function SignUpPage() {
     router.push("/setup");
   };
 
+  const getCallbackOrigin = () => {
+    const origin = window.location.origin;
+    if (origin.includes("0.0.0.0") || origin.includes("localhost")) {
+      return "https://ef56ebb3-2ce1-4dec-8167-5daa1513dfea-00-1oty1kskkkchh.spock.replit.dev";
+    }
+    return origin;
+  };
+
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
     setAuthError(null);
@@ -100,7 +108,7 @@ export default function SignUpPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/home`,
+        redirectTo: `${getCallbackOrigin()}/auth/callback?next=/home`,
         queryParams: { access_type: "offline", prompt: "consent" },
       },
     });
