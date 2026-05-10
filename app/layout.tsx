@@ -32,6 +32,7 @@ export default function RootLayout({
     "/terms",
     "/privacy",
     "/support",
+    "/auth/callback",
   ];
 
   const isPublicPage = publicPages.includes(pathname);
