@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const ALLOWED_REDIRECTS = ["/home", "/forgot-password", "/setup", "/profile", "/settings"];
+const ALLOWED_REDIRECTS = ["/home", "/forgot-password", "/setup", "/profile", "/settings", "/admin"];
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const rawNext = searchParams.get("next") ?? "/setup";
+  const rawNext = searchParams.get("next") ?? "/home";
 
   const next = ALLOWED_REDIRECTS.includes(rawNext) ? rawNext : "/home";
 
@@ -17,9 +17,10 @@ export async function GET(request: Request) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error && data.user) {
         const admin = createAdminClient();
+
         const { data: existingProfile } = await admin
           .from("profiles")
-          .select("id")
+          .select("id, role")
           .eq("id", data.user.id)
           .single();
 
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
           const { error: profileError } = await admin.from("profiles").insert({
             id: data.user.id,
             email: data.user.email || "",
-            full_name: meta.full_name || "",
+            full_name: meta.full_name || meta.name || "",
             university: meta.university || "",
             faculty: meta.faculty || "",
           });
@@ -39,6 +40,11 @@ export async function GET(request: Request) {
           if (settingsError) {
             console.error("Callback settings upsert error:", settingsError);
           }
+          return NextResponse.redirect(`${origin}/setup`);
+        }
+
+        if (existingProfile.role === "admin") {
+          return NextResponse.redirect(`${origin}/admin`);
         }
 
         return NextResponse.redirect(`${origin}${next}`);

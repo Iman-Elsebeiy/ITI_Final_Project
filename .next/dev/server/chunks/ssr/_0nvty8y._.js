@@ -57,7 +57,7 @@ function createAdminClient() {
 "[project]/app/auth/actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"002dec592ace15118d5098ae7c08d28ce0bc1ed663":{"name":"logout"},"401fec90216c128f868b1b5a80b0d01bba848783c9":{"name":"login"},"404a09b8840500ceff4acad093d81c8cd93d172b92":{"name":"resetPassword"},"40644037027030d80aa41b958803cf6de39e29bba9":{"name":"signup"},"408827c25adac6562a48885dec4bd05234652d4ce4":{"name":"forgotPassword"}},"app/auth/actions.ts",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"002dec592ace15118d5098ae7c08d28ce0bc1ed663":{"name":"logout"},"00d1aaf685551fae87a269be8b4679df3912e61976":{"name":"signInWithGoogle"},"401fec90216c128f868b1b5a80b0d01bba848783c9":{"name":"login"},"404a09b8840500ceff4acad093d81c8cd93d172b92":{"name":"resetPassword"},"40644037027030d80aa41b958803cf6de39e29bba9":{"name":"signup"},"408827c25adac6562a48885dec4bd05234652d4ce4":{"name":"forgotPassword"}},"app/auth/actions.ts",""] */ __turbopack_context__.s([
     "forgotPassword",
     ()=>forgotPassword,
     "login",
@@ -66,6 +66,8 @@ function createAdminClient() {
     ()=>logout,
     "resetPassword",
     ()=>resetPassword,
+    "signInWithGoogle",
+    ()=>signInWithGoogle,
     "signup",
     ()=>signup
 ]);
@@ -203,6 +205,28 @@ async function logout() {
     }
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$components$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["redirect"])("/login");
 }
+async function signInWithGoogle() {
+    const supabase = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$server$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createClient"])();
+    const appUrl = ("TURBOPACK compile-time value", "http://0.0.0.0:5000") || "http://localhost:5000";
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+            redirectTo: `${appUrl}/auth/callback?next=/home`,
+            queryParams: {
+                access_type: "offline",
+                prompt: "consent"
+            }
+        }
+    });
+    if (error) {
+        return {
+            error: error.message
+        };
+    }
+    return {
+        url: data.url
+    };
+}
 async function forgotPassword(email) {
     try {
         const supabase = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$server$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createClient"])();
@@ -248,12 +272,14 @@ async function resetPassword(password) {
     login,
     signup,
     logout,
+    signInWithGoogle,
     forgotPassword,
     resetPassword
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(login, "401fec90216c128f868b1b5a80b0d01bba848783c9", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(signup, "40644037027030d80aa41b958803cf6de39e29bba9", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(logout, "002dec592ace15118d5098ae7c08d28ce0bc1ed663", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(signInWithGoogle, "00d1aaf685551fae87a269be8b4679df3912e61976", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(forgotPassword, "408827c25adac6562a48885dec4bd05234652d4ce4", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(resetPassword, "404a09b8840500ceff4acad093d81c8cd93d172b92", null);
 }),

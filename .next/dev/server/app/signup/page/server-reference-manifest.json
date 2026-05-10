@@ -47,6 +47,18 @@
       },
       "exportedName": "signup",
       "filename": "app/auth/actions.ts"
+    },
+    "00d1aaf685551fae87a269be8b4679df3912e61976": {
+      "workers": {
+        "app/signup/page": {
+          "moduleId": "[project]/.next-internal/server/app/signup/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/auth/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/lib/data/profile.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/lib/data/messages.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "signInWithGoogle",
+          "filename": "app/auth/actions.ts"
+        }
+      },
+      "exportedName": "signInWithGoogle",
+      "filename": "app/auth/actions.ts"
     }
   },
   "edge": {}
