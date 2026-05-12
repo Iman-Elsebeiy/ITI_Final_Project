@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   TrendingUp,
@@ -25,6 +26,7 @@ import type { Profile, Item, Notification } from "@/lib/types";
 import { PERIOD_LABELS } from "@/lib/types";
 
 export default function HomePage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [trendingItems, setTrendingItems] = useState<Item[]>([]);
@@ -191,7 +193,7 @@ export default function HomePage() {
                 const imageUrl = item.image_paths?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
 
                 return (
-                  <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+                  <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer" onClick={() => router.push(`/item/${item.id}`)}>
                     <div className="relative h-48 overflow-hidden">
                       <img src={imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                       <div className="absolute top-3 left-3">

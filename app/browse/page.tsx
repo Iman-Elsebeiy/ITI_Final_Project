@@ -194,7 +194,7 @@ export default function BrowsePage() {
               <div
                 key={item.id}
                 className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden cursor-pointer ${viewMode === "list" ? "flex" : ""}`}
-                onClick={() => router.push(`/browse`)}
+                onClick={() => router.push(`/item/${item.id}`)}
               >
                 <div className={viewMode === "list" ? "w-48 flex-shrink-0" : ""}>
                   <div className="relative">

@@ -119,6 +119,52 @@ export async function sendMessage(conversationId: string, content: string) {
   }
 }
 
+export async function getOrCreateConversation(otherUserId: string): Promise<{ conversationId?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+    if (user.id === otherUserId) return { error: "Cannot message yourself" };
+
+    // Find existing conversation between these two users
+    const { data: myParticipations } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id")
+      .eq("user_id", user.id);
+
+    if (myParticipations && myParticipations.length > 0) {
+      const myConvIds = myParticipations.map((p: { conversation_id: string }) => p.conversation_id);
+      const { data: otherParticipations } = await supabase
+        .from("conversation_participants")
+        .select("conversation_id")
+        .eq("user_id", otherUserId)
+        .in("conversation_id", myConvIds);
+
+      if (otherParticipations && otherParticipations.length > 0) {
+        return { conversationId: otherParticipations[0].conversation_id };
+      }
+    }
+
+    // Create new conversation
+    const { data: conv, error: convError } = await supabase
+      .from("conversations")
+      .insert({})
+      .select()
+      .single();
+
+    if (convError || !conv) return { error: convError?.message || "Failed to create conversation" };
+
+    await supabase.from("conversation_participants").insert([
+      { conversation_id: conv.id, user_id: user.id },
+      { conversation_id: conv.id, user_id: otherUserId },
+    ]);
+
+    return { conversationId: conv.id };
+  } catch {
+    return { error: "An unexpected error occurred" };
+  }
+}
+
 export async function getUnreadMessageCount(): Promise<number> {
   try {
     const supabase = await createClient();

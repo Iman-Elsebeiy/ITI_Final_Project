@@ -121,8 +121,8 @@ export default function FavoritesPage() {
                     <span className="text-xs text-[#2C2C2C]/60">Added {getTimeAgo(item.added_at)}</span>
                   </label>
                 </div>
-                <div className="relative">
-                  <img src={imageUrl} alt={item.title} className="w-full h-48 object-cover" />
+                <div className="relative cursor-pointer" onClick={() => router.push(`/item/${item.id}`)}>
+                  <img src={imageUrl} alt={item.title} className="w-full h-48 object-cover hover:opacity-95 transition-opacity" />
                   {!item.available && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <span className="px-4 py-2 bg-white rounded-lg font-bold text-sm">Not Available</span>
@@ -136,7 +136,7 @@ export default function FavoritesPage() {
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="text-lg font-bold text-[#2C2C2C] mb-1 line-clamp-1">{item.title}</h3>
+                  <h3 className="text-lg font-bold text-[#2C2C2C] mb-1 line-clamp-1 cursor-pointer hover:text-[#1DA5A6] transition-colors" onClick={() => router.push(`/item/${item.id}`)}>{item.title}</h3>
                   <p className="text-xs text-[#2C2C2C]/60 mb-2">{item.category}</p>
                   <div className="flex items-center gap-2 text-sm text-[#2C2C2C]/60 mb-4">
                     <MapPin className="w-4 h-4" />
@@ -147,7 +147,7 @@ export default function FavoritesPage() {
                       <p className="text-2xl font-bold text-[#1DA5A6]">EGP {item.price}</p>
                       <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
                     </div>
-                    <button onClick={() => router.push(`/browse`)} disabled={!item.available}
+                    <button onClick={() => router.push(`/item/${item.id}`)} disabled={!item.available}
                       className="px-4 py-2 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                       <ShoppingCart className="w-4 h-4" />Rent Now
                     </button>

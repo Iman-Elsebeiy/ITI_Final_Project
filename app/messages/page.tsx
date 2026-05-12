@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   Send,
@@ -38,18 +39,23 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     async function load() {
       const data = await getConversations();
       setConversations(data as ConversationData[]);
-      if (data.length > 0) {
+      const convParam = searchParams.get("conv");
+      if (convParam) {
+        setSelectedConvId(convParam);
+        setShowMobileChat(true);
+      } else if (data.length > 0) {
         setSelectedConvId((data[0] as ConversationData).id);
       }
       setLoading(false);
     }
     load();
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (selectedConvId) {
