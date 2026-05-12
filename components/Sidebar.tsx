@@ -124,8 +124,14 @@ export default function Sidebar() {
 
         <div className="p-4 border-t border-[#2C2C2C]/10">
           <div className="flex items-center gap-3 px-4 py-3 bg-[#F1F3F5] rounded-xl mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#1DA5A6] to-[#194774] rounded-full flex items-center justify-center text-white font-bold">
-              {initials}
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile?.full_name || ""} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[#1DA5A6] to-[#194774] flex items-center justify-center text-white font-bold">
+                  {initials}
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#2C2C2C] truncate">

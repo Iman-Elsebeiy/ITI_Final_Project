@@ -71,8 +71,14 @@ export default function ProfilePage() {
       <div className="bg-white rounded-2xl shadow-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#1DA5A6] to-[#194774] p-8">
           <div className="flex items-center gap-6">
-            <div className="w-24 h-24 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-white/30">
-              {initials}
+            <div className="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden flex items-center justify-center">
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.full_name || ""} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-3xl font-bold">
+                  {initials}
+                </div>
+              )}
             </div>
             <div className="text-white">
               <h2 className="text-2xl font-bold">{profile.full_name || "No name set"}</h2>
