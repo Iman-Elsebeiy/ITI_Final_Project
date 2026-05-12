@@ -42,6 +42,7 @@ export async function updateSession(request: NextRequest) {
     "/terms",
     "/privacy",
     "/support",
+    "/account-deleted",
   ];
 
   const isPublicPath =
@@ -58,6 +59,21 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/home";
     return NextResponse.redirect(url);
+  }
+
+  if (user && request.nextUrl.pathname !== "/account-deleted") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("deleted_at")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.deleted_at) {
+      await supabase.auth.signOut();
+      const url = request.nextUrl.clone();
+      url.pathname = "/account-deleted";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

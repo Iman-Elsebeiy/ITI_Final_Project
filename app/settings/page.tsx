@@ -18,18 +18,22 @@ import {
   Camera,
   CheckCircle2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { logout } from "@/app/auth/actions";
-import { getCurrentProfile, updateProfile, getUserSettings, updateUserSettings } from "@/lib/data/profile";
+import { getCurrentProfile, updateProfile, getUserSettings, updateUserSettings, deleteAccount } from "@/lib/data/profile";
 import type { Profile, UserSettings } from "@/lib/types";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<
     "profile" | "account" | "notifications" | "privacy" | "preferences"
   >("profile");
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [profileData, setProfileData] = useState({
     fullName: "",
@@ -155,6 +159,19 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    const result = await deleteAccount();
+    if (result?.error) {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setSaveError(result.error);
+      setTimeout(() => setSaveError(""), 5000);
+      return;
+    }
+    router.push("/account-deleted");
   };
 
   const initials = profileData.fullName
@@ -334,7 +351,12 @@ export default function SettingsPage() {
                     <Trash2 className="w-5 h-5" />Delete Account
                   </h3>
                   <p className="text-sm text-red-700 mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
-                  <button className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all">Delete Account</button>
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
+                  >
+                    Delete Account
+                  </button>
                 </div>
               </div>
             )}
@@ -477,6 +499,52 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => !isDeleting && setShowDeleteModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <Trash2 className="w-7 h-7 text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-[#2C2C2C] text-center mb-2">
+              Delete Account?
+            </h2>
+            <p className="text-[#2C2C2C]/60 text-sm text-center mb-2">
+              Are you sure you want to delete your account? This will sign you out immediately.
+            </p>
+            <p className="text-amber-600 text-xs text-center mb-7 bg-amber-50 rounded-lg p-3 border border-amber-200">
+              For legal reasons, some data (e.g. active rentals) may be retained for up to 30 days before permanent deletion.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="flex-1 py-3 border-2 border-[#2C2C2C]/10 text-[#2C2C2C] rounded-xl font-semibold hover:bg-[#F1F3F5] transition-all disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Yes, Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
