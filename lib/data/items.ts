@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Item } from "@/lib/types";
 
 const BUCKET_NAME = "item-images";
@@ -12,20 +13,24 @@ export async function uploadItemImage(formData: FormData): Promise<{ url?: strin
     if (!user) return { error: "Not authenticated" };
 
     const file = formData.get("file") as File;
-    if (!file) return { error: "No file provided" };
+    if (!file || file.size === 0) return { error: "No file provided" };
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    const { error: uploadError } = await supabase.storage
+    const admin = createAdminClient();
+    const bytes = await file.arrayBuffer();
+
+    const { error: uploadError } = await admin.storage
       .from(BUCKET_NAME)
-      .upload(fileName, file, { contentType: file.type, upsert: false });
+      .upload(fileName, bytes, { contentType: file.type, upsert: false });
 
     if (uploadError) return { error: uploadError.message };
 
-    const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+    const { data: urlData } = admin.storage.from(BUCKET_NAME).getPublicUrl(fileName);
     return { url: urlData.publicUrl };
-  } catch {
+  } catch (e) {
+    console.error("uploadItemImage error:", e);
     return { error: "Upload failed" };
   }
 }
@@ -138,15 +143,17 @@ export async function createItem(itemData: {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: "Not authenticated" };
 
-    const { data, error } = await supabase
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from("items")
-      .insert({ ...itemData, owner_id: user.id })
+      .insert({ ...itemData, owner_id: user.id, available: true })
       .select()
       .single();
 
     if (error) return { error: error.message };
     return { success: true, data };
-  } catch {
+  } catch (e) {
+    console.error("createItem error:", e);
     return { error: "An unexpected error occurred" };
   }
 }
