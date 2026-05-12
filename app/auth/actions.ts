@@ -150,12 +150,30 @@ export async function forgotPassword(email: string) {
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000"}/auth/callback?next=/forgot-password`,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
       return { error: error.message };
+    }
+
+    return { success: true };
+  } catch {
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+
+export async function verifyResetOtp(email: string, token: string) {
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "recovery",
+    });
+
+    if (error) {
+      return { error: "Invalid or expired code. Please try again." };
     }
 
     return { success: true };

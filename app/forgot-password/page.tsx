@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Send,
 } from "lucide-react";
-import { forgotPassword, resetPassword } from "@/app/auth/actions";
+import { forgotPassword, resetPassword, verifyResetOtp } from "@/app/auth/actions";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -78,9 +78,16 @@ export default function ForgotPasswordPage() {
     if (code.length !== 6) return;
 
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Verification code:", code);
+    setAuthError(null);
+
+    const result = await verifyResetOtp(email, code);
+
+    if (result.error) {
+      setAuthError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(false);
     setStep(3);
   };
@@ -141,7 +148,8 @@ export default function ForgotPasswordPage() {
   // Resend code
   const handleResendCode = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setAuthError(null);
+    await forgotPassword(email);
     setIsLoading(false);
     setVerificationCode(["", "", "", "", "", ""]);
     startResendTimer();
@@ -283,6 +291,13 @@ export default function ForgotPasswordPage() {
                   <span className="font-semibold text-[#1DA5A6]">{email}</span>
                 </p>
               </div>
+
+              {/* Error Message */}
+              {authError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">
+                  {authError}
+                </div>
+              )}
 
               {/* OTP Input */}
               <div className="flex gap-2 justify-center mb-6">
