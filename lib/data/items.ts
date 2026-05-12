@@ -97,11 +97,25 @@ export async function getItems(options?: {
 export async function getItemById(id: string): Promise<Item | null> {
   try {
     const supabase = await createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("items")
-      .select("*, owner:profiles!owner_id(id, full_name, university, avatar_url, location)")
+      .select("*, owner:profiles!owner_id(id, full_name, university, avatar_url)")
       .eq("id", id)
       .single();
+
+    if (error || !data) return null;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: fav } = await supabase
+        .from("favorites")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("item_id", id)
+        .maybeSingle();
+      return { ...data, is_favorite: !!fav };
+    }
+
     return data;
   } catch {
     return null;
