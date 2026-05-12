@@ -25,6 +25,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 async function updateSession(request) {
+    // Skip session management for auth routes to avoid interfering with PKCE flow
+    if (request.nextUrl.pathname.startsWith("/auth/")) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
+            request
+        });
+    }
     let supabaseResponse = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
         request
     });
@@ -50,10 +56,9 @@ async function updateSession(request) {
         "/forgot-password",
         "/terms",
         "/privacy",
-        "/support",
-        "/auth/callback"
+        "/support"
     ];
-    const isPublicPath = publicPaths.some((path)=>request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith("/auth/")) || request.nextUrl.pathname.startsWith("/api/");
+    const isPublicPath = publicPaths.some((path)=>request.nextUrl.pathname === path) || request.nextUrl.pathname.startsWith("/api/");
     if (!user && !isPublicPath) {
         const url = request.nextUrl.clone();
         url.pathname = "/login";
@@ -66,10 +71,6 @@ async function updateSession(request) {
         const url = request.nextUrl.clone();
         url.pathname = "/home";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(url);
-    }
-    // Protect /admin from non-admin users
-    if (user && request.nextUrl.pathname.startsWith("/admin")) {
-    // We'll let the page handle the auth check via API
     }
     return supabaseResponse;
 }

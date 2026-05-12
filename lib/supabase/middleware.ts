@@ -2,6 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  // Skip session management for auth routes to avoid interfering with PKCE flow
+  if (request.nextUrl.pathname.startsWith("/auth/")) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -37,15 +42,11 @@ export async function updateSession(request: NextRequest) {
     "/terms",
     "/privacy",
     "/support",
-    "/auth/callback",
   ];
 
   const isPublicPath =
-    publicPaths.some(
-      (path) =>
-        request.nextUrl.pathname === path ||
-        request.nextUrl.pathname.startsWith("/auth/")
-    ) || request.nextUrl.pathname.startsWith("/api/");
+    publicPaths.some((path) => request.nextUrl.pathname === path) ||
+    request.nextUrl.pathname.startsWith("/api/");
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
@@ -57,11 +58,6 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/home";
     return NextResponse.redirect(url);
-  }
-
-  // Protect /admin from non-admin users
-  if (user && request.nextUrl.pathname.startsWith("/admin")) {
-    // We'll let the page handle the auth check via API
   }
 
   return supabaseResponse;

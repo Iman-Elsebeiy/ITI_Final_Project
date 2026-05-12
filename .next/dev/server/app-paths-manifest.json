@@ -1,13 +1,5 @@
 {
-  "/auth/callback/route": "app/auth/callback/route.js",
-  "/browse/page": "app/browse/page.js",
-  "/history/page": "app/history/page.js",
   "/home/page": "app/home/page.js",
-  "/list-item/page": "app/list-item/page.js",
   "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/rentals/page": "app/rentals/page.js",
-  "/setup/page": "app/setup/page.js",
-  "/signup/page": "app/signup/page.js"
+  "/page": "app/page.js"
 }
