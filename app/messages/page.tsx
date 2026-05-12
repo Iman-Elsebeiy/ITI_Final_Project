@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Search,
@@ -30,7 +30,7 @@ type MessageData = {
   created_at: string;
 };
 
-export default function MessagesPage() {
+function MessagesContent() {
   const [conversations, setConversations] = useState<ConversationData[]>([]);
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageData[]>([]);
@@ -218,5 +218,17 @@ export default function MessagesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-4 border-[#1DA5A6] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <MessagesContent />
+    </Suspense>
   );
 }
