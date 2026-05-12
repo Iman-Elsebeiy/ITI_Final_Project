@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { logout } from "@/app/auth/actions";
-import { getCurrentProfile, updateProfile, getUserSettings, updateUserSettings, deleteAccount } from "@/lib/data/profile";
+import { getCurrentProfile, updateProfile, getUserSettings, updateUserSettings, deleteAccount, uploadAvatar, removeAvatar } from "@/lib/data/profile";
 import type { Profile, UserSettings } from "@/lib/types";
 
 export default function SettingsPage() {
@@ -34,6 +34,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const [profileData, setProfileData] = useState({
     fullName: "",
@@ -79,6 +81,7 @@ export default function SettingsPage() {
           university: profile.university || "",
           faculty: profile.faculty || "",
         });
+        setAvatarUrl(profile.avatar_url || null);
       }
 
       if (settings) {
@@ -159,6 +162,37 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    setSaveError("");
+    const formData = new FormData();
+    formData.append("avatar", file);
+    const result = await uploadAvatar(formData);
+    if (result.error) {
+      setSaveError(result.error);
+      setTimeout(() => setSaveError(""), 5000);
+    } else if (result.avatarUrl) {
+      setAvatarUrl(result.avatarUrl);
+    }
+    setIsUploadingAvatar(false);
+    e.target.value = "";
+  };
+
+  const handleRemoveAvatar = async () => {
+    setIsUploadingAvatar(true);
+    setSaveError("");
+    const result = await removeAvatar();
+    if (result.error) {
+      setSaveError(result.error);
+      setTimeout(() => setSaveError(""), 5000);
+    } else {
+      setAvatarUrl(null);
+    }
+    setIsUploadingAvatar(false);
   };
 
   const handleDeleteAccount = async () => {
@@ -244,19 +278,37 @@ export default function SettingsPage() {
 
                 <div className="flex items-center gap-6 p-6 bg-[#F1F3F5] rounded-xl">
                   <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-[#1DA5A6] to-[#194774] rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                      {initials}
-                    </div>
-                    <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-24 h-24 bg-gradient-to-br from-[#1DA5A6] to-[#194774] rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                        {initials}
+                      </div>
+                    )}
+                    {isUploadingAvatar && (
+                      <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+                    <label className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer">
                       <Camera className="w-4 h-4 text-[#1DA5A6]" />
-                    </button>
+                      <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleAvatarUpload} disabled={isUploadingAvatar} />
+                    </label>
                   </div>
                   <div>
                     <h3 className="font-bold text-[#2C2C2C] mb-1">Profile Photo</h3>
                     <p className="text-sm text-[#2C2C2C]/60 mb-3">JPG, PNG or GIF, max size 5MB</p>
                     <div className="flex gap-3">
-                      <button className="px-4 py-2 bg-[#1DA5A6] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">Upload Photo</button>
-                      <button className="px-4 py-2 bg-white border-2 border-[#2C2C2C]/10 text-[#2C2C2C] rounded-lg text-sm font-semibold hover:border-[#1DA5A6]/30 transition-all">Remove</button>
+                      <label className={`px-4 py-2 bg-[#1DA5A6] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer ${isUploadingAvatar ? "opacity-50 cursor-not-allowed" : ""}`}>
+                        {isUploadingAvatar ? "Uploading..." : "Upload Photo"}
+                        <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleAvatarUpload} disabled={isUploadingAvatar} />
+                      </label>
+                      {avatarUrl && (
+                        <button onClick={handleRemoveAvatar} disabled={isUploadingAvatar}
+                          className="px-4 py-2 bg-white border-2 border-[#2C2C2C]/10 text-[#2C2C2C] rounded-lg text-sm font-semibold hover:border-red-300 hover:text-red-500 transition-all disabled:opacity-50">
+                          Remove
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
