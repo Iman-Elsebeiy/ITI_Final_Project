@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", "", "", ""]);
   const [resendTimer, setResendTimer] = useState(60);
 
   const {
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
   // Step 2: Verify OTP code
   const onSubmitVerification = async () => {
     const code = verificationCode.join("");
-    if (code.length !== 6) return;
+    if (code.length !== 8) return;
 
     setIsLoading(true);
     setAuthError(null);
@@ -286,7 +286,7 @@ export default function ForgotPasswordPage() {
                   Check Your Email
                 </h2>
                 <p className="text-[#2C2C2C]/60 text-sm">
-                  We sent a 6-digit code to
+                  We sent an 8-digit code to
                   <br />
                   <span className="font-semibold text-[#1DA5A6]">{email}</span>
                 </p>
@@ -337,7 +337,7 @@ export default function ForgotPasswordPage() {
 
               <button
                 onClick={onSubmitVerification}
-                disabled={verificationCode.join("").length !== 6 || isLoading}
+                disabled={verificationCode.join("").length !== 8 || isLoading}
                 className="w-full h-14 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
