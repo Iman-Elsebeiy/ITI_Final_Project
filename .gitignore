@@ -20,3 +20,16 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Replit agent assets (screenshots sent in chat - not needed in repo)
+attached_assets/
+
+# Replit internal files
+.replit
+.canvas/
+replit.nix
+AGENTS.md
+CLAUDE.md
+
+# Build cache
+tsconfig.tsbuildinfo
