@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -56,6 +56,14 @@ const roles = [
 ];
 
 export default function SetupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F1F3F5]" />}>
+      <SetupPageInner />
+    </Suspense>
+  );
+}
+
+function SetupPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "";
