@@ -24,7 +24,6 @@ import {
 import { getItemById } from "@/lib/data/items";
 import { toggleFavorite } from "@/lib/data/favorites";
 import { getOrCreateConversation } from "@/lib/data/messages";
-import { createRental } from "@/lib/data/rentals";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { PERIOD_LABELS, CONDITION_LABELS, CATEGORY_ICONS } from "@/lib/types";
 import type { Item, Profile } from "@/lib/types";
@@ -103,24 +102,30 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
     if (!total) return;
     setRentLoading(true);
     setRentError("");
-    const result = await createRental({
-      item_id: item.id,
-      lender_id: item.owner_id,
-      total_price: total,
-      start_date: startDate,
-      end_date: endDate,
-      pickup_location: item.location || undefined,
-    });
-    setRentLoading(false);
-    if (result.error) {
-      setRentError(result.error);
-    } else {
-      setRentSuccess(true);
-      setTimeout(() => {
-        setShowRentModal(false);
-        setRentSuccess(false);
-        router.push("/rentals");
-      }, 1500);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          item_id: item.id,
+          lender_id: item.owner_id,
+          total_price: total,
+          start_date: startDate,
+          end_date: endDate,
+          pickup_location: item.location || "",
+          item_title: item.title,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setRentError(data.error);
+        setRentLoading(false);
+      } else if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      setRentError("Something went wrong. Please try again.");
+      setRentLoading(false);
     }
   };
 
