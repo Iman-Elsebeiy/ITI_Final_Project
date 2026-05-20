@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       // Create the rental
       const { error: rentalError } = await supabase.from("rentals").insert({
         item_id: meta.item_id,
+        renter_id: meta.borrower_id,
         borrower_id: meta.borrower_id,
         lender_id: meta.lender_id,
         total_price: parseFloat(meta.total_price),
