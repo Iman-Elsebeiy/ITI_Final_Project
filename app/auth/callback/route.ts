@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const ALLOWED_REDIRECTS = ["/home", "/forgot-password", "/setup", "/profile", "/settings", "/admin"];
+const ALLOWED_REDIRECTS = ["/home", "/browse", "/forgot-password", "/setup", "/profile", "/settings", "/admin", "/rentals", "/favorites", "/history", "/messages", "/list-item"];
+const ALLOWED_PREFIXES = ["/item/", "/items/"];
+
+function isSafeRedirect(path: string): boolean {
+  if (!path.startsWith("/") || path.startsWith("//")) return false;
+  if (ALLOWED_REDIRECTS.includes(path)) return true;
+  return ALLOWED_PREFIXES.some((p) => path.startsWith(p));
+}
 
 function getOrigin(request: Request): string {
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -23,7 +30,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const rawNext = searchParams.get("next") ?? "/home";
-  const next = ALLOWED_REDIRECTS.includes(rawNext) ? rawNext : "/home";
+  const next = isSafeRedirect(rawNext) ? rawNext : "/home";
   const origin = getOrigin(request);
 
   if (code) {
@@ -50,7 +57,10 @@ export async function GET(request: Request) {
             faculty: "",
           });
           await admin.from("user_settings").upsert({ id: data.user.id });
-          return NextResponse.redirect(`${origin}/setup`);
+          const setupUrl = next !== "/home"
+            ? `/setup?redirect=${encodeURIComponent(next)}`
+            : "/setup";
+          return NextResponse.redirect(`${origin}${setupUrl}`);
         }
 
         if (existingProfile.role === "admin") {
