@@ -3,7 +3,6 @@
 import { useState, useEffect, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Package, ShoppingCart, Home } from "lucide-react";
-import { createAdminRental } from "@/lib/data/rentals";
 import { Suspense } from "react";
 
 function RentalSuccessContent() {
