@@ -27,9 +27,14 @@ export default function HistoryPage() {
 
   useEffect(() => {
     async function load() {
-      const data = await getRentalHistory();
-      setHistory(data as RentalWithType[]);
-      setLoading(false);
+      try {
+        const data = await getRentalHistory();
+        setHistory(data as RentalWithType[]);
+      } catch {
+        // show empty state on error
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);

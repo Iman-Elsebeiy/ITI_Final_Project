@@ -33,9 +33,14 @@ export default function RentalsPage() {
 
   useEffect(() => {
     async function load() {
-      const data = await getUserRentals();
-      setRentals(data as RentalWithType[]);
-      setLoading(false);
+      try {
+        const data = await getUserRentals();
+        setRentals(data as RentalWithType[]);
+      } catch {
+        // show empty state on error
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);

@@ -24,9 +24,14 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     async function load() {
-      const data = await getUserFavorites();
-      setFavorites(data as FavoriteItem[]);
-      setLoading(false);
+      try {
+        const data = await getUserFavorites();
+        setFavorites(data as FavoriteItem[]);
+      } catch {
+        // show empty state on error
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);

@@ -25,13 +25,18 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function load() {
-      const [profileData, rentalStats] = await Promise.all([
-        getCurrentProfile(),
-        getRentalStats(),
-      ]);
-      setProfile(profileData);
-      setStats(rentalStats);
-      setLoading(false);
+      try {
+        const [profileData, rentalStats] = await Promise.allSettled([
+          getCurrentProfile(),
+          getRentalStats(),
+        ]);
+        if (profileData.status === "fulfilled") setProfile(profileData.value);
+        if (rentalStats.status === "fulfilled") setStats(rentalStats.value);
+      } catch {
+        // show empty state on error
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);

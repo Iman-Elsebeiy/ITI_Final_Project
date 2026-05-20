@@ -31,17 +31,22 @@ export default function BrowsePage() {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-    const category = selectedCategory === "All Categories" ? undefined : selectedCategory;
-    const search = searchQuery || undefined;
-    const [fetchedItems, count, favorites] = await Promise.all([
-      getItems({ category, search, sortBy }),
-      getItemCount(),
-      getFavoriteCount(),
-    ]);
-    setItems(fetchedItems);
-    setItemCount(count);
-    setFavCount(favorites);
-    setLoading(false);
+    try {
+      const category = selectedCategory === "All Categories" ? undefined : selectedCategory;
+      const search = searchQuery || undefined;
+      const [fetchedItems, count, favorites] = await Promise.allSettled([
+        getItems({ category, search, sortBy }),
+        getItemCount(),
+        getFavoriteCount(),
+      ]);
+      if (fetchedItems.status === "fulfilled") setItems(fetchedItems.value);
+      if (count.status === "fulfilled") setItemCount(count.value);
+      if (favorites.status === "fulfilled") setFavCount(favorites.value);
+    } catch {
+      // show empty state on error
+    } finally {
+      setLoading(false);
+    }
   }, [selectedCategory, searchQuery, sortBy]);
 
   useEffect(() => {

@@ -36,17 +36,23 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadData() {
-      const [profileData, items, rentalStats, notifications] = await Promise.all([
-        getCurrentProfile(),
-        getItems({ limit: 4 }),
-        getRentalStats(),
-        getNotifications(),
-      ]);
-      setProfile(profileData);
-      setTrendingItems(items);
-      setStats(rentalStats);
-      setRecentActivity(notifications.slice(0, 4));
-      setLoading(false);
+      try {
+        const [profileData, itemsData, rentalStats, notifications] = await Promise.allSettled([
+          getCurrentProfile(),
+          getItems({ limit: 4 }),
+          getRentalStats(),
+          getNotifications(),
+        ]);
+
+        if (profileData.status === "fulfilled") setProfile(profileData.value);
+        if (itemsData.status === "fulfilled") setTrendingItems(itemsData.value);
+        if (rentalStats.status === "fulfilled") setStats(rentalStats.value);
+        if (notifications.status === "fulfilled") setRecentActivity(notifications.value.slice(0, 4));
+      } catch {
+        // silently fail — show page with whatever loaded
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, []);
