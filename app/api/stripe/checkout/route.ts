@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
 
     const stripe = await getUncachableStripeClient();
 
-    // Derive the app URL from the incoming request so it works in both dev and production
-    const appUrl = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
+    // Use hardcoded production URL env var, fallback to request origin for dev
+    const appUrl = process.env.APP_PRODUCTION_URL ||
+      `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("x-forwarded-host") || req.headers.get("host") || req.nextUrl.host}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

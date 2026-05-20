@@ -43,6 +43,9 @@ SUPABASE_ITEM_IMAGES_BUCKET = "item-images"
 SUPABASE_STUDENT_IDS_BUCKET = "student-ids"
 SUPABASE_AVATARS_BUCKET = "avatars"
 
+[userenv.production]
+APP_PRODUCTION_URL = "https://iti-final.replit.app"
+
 [deployment]
 deploymentTarget = "autoscale"
 run = ["npm", "run", "start"]
