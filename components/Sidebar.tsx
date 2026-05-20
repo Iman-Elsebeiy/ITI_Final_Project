@@ -161,22 +161,30 @@ export default function Sidebar() {
               </button>
             </>
           ) : (
-            <div className="space-y-2">
-              <Link
-                href="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-semibold rounded-xl hover:shadow-md transition-all"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#1DA5A6] text-[#1DA5A6] font-semibold rounded-xl hover:bg-[#1DA5A6]/5 transition-all"
-              >
-                Sign Up
-              </Link>
-            </div>
+            (() => {
+              const isAuthPage = ["/login", "/signup", "/forgot-password", "/setup"].includes(pathname);
+              const redirectParam = !isAuthPage && pathname && pathname !== "/"
+                ? `?redirect=${encodeURIComponent(pathname)}`
+                : "";
+              return (
+                <div className="space-y-2">
+                  <Link
+                    href={`/login${redirectParam}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-semibold rounded-xl hover:shadow-md transition-all"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href={`/signup${redirectParam}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#1DA5A6] text-[#1DA5A6] font-semibold rounded-xl hover:bg-[#1DA5A6]/5 transition-all"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              );
+            })()
           )}
         </div>
       </aside>
