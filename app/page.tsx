@@ -13,9 +13,9 @@ export default function SplashScreen() {
       setFadeOut(true);
     }, 2000);
 
-    // Navigate to login after fade out completes
+    // Navigate to home after fade out completes
     const navigateTimer = setTimeout(() => {
-      router.push("/login");
+      router.push("/home");
     }, 2500);
 
     return () => {

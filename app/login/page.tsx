@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { login } from "@/app/auth/actions";
@@ -16,6 +16,8 @@ type LoginFormData = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "";
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -42,7 +44,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push(result.redirect || "/home");
+    router.push(redirectTo || result.redirect || "/home");
   };
 
   const getCallbackOrigin = () => {
@@ -61,7 +63,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${getCallbackOrigin()}/auth/callback?next=/home`,
+        redirectTo: `${getCallbackOrigin()}/auth/callback?next=${encodeURIComponent(redirectTo || "/home")}`,
         queryParams: { access_type: "offline", prompt: "consent" },
       },
     });
@@ -219,7 +221,7 @@ export default function LoginPage() {
             {/* Sign Up Link */}
             <p className="text-center text-sm text-[#2C2C2C]/60 mt-6">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors">
+              <Link href={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : "/signup"} className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors">
                 Sign Up
               </Link>
             </p>

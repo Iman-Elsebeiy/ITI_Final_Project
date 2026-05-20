@@ -81,6 +81,10 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
   const handleFavorite = async () => {
     if (!item) return;
+    if (!currentUserId) {
+      router.push(`/login?redirect=${encodeURIComponent(`/item/${item.id}`)}`);
+      return;
+    }
     const prev = isFavorite;
     setIsFavorite(!prev);
     await toggleFavorite(item.id);
@@ -88,6 +92,10 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
   const handleContact = async () => {
     if (!owner) return;
+    if (!currentUserId) {
+      router.push(`/login?redirect=${encodeURIComponent(`/item/${id}`)}`);
+      return;
+    }
     setContactLoading(true);
     const result = await getOrCreateConversation(owner.id);
     setContactLoading(false);
@@ -98,6 +106,10 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
   const handleRent = async () => {
     if (!item || !startDate || !endDate) return;
+    if (!currentUserId) {
+      router.push(`/login?redirect=${encodeURIComponent(`/item/${item.id}`)}`);
+      return;
+    }
     const total = calcTotal();
     if (!total) return;
     setRentLoading(true);

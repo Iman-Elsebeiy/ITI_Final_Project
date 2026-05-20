@@ -27,31 +27,38 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-    getCurrentProfile().then(setProfile);
-    getUnreadMessageCount().then(setUnreadMessages);
+    getCurrentProfile()
+      .then(setProfile)
+      .finally(() => setAuthLoaded(true));
+    getUnreadMessageCount().then(setUnreadMessages).catch(() => {});
   }, []);
 
   const handleLogout = async () => {
     await logout();
   };
 
+  const isAuthed = !!profile;
+
   const initials = profile?.full_name
     ? profile.full_name.split(" ").map((n) => n[0]).join("").toUpperCase()
     : "?";
 
-  const menuItems = [
-    { name: "Home", path: "/home", icon: Home },
-    { name: "Browse Items", path: "/browse", icon: Search },
-    { name: "My Rentals", path: "/rentals", icon: Package },
-    { name: "List Item", path: "/list-item", icon: PlusCircle },
-    { name: "Messages", path: "/messages", icon: MessageCircle, badge: unreadMessages || undefined },
-    { name: "Favorites", path: "/favorites", icon: Heart },
-    { name: "History", path: "/history", icon: History },
-    { name: "Profile", path: "/profile", icon: User },
-    { name: "Settings", path: "/settings", icon: Settings },
+  const allMenuItems = [
+    { name: "Home", path: "/home", icon: Home, public: true },
+    { name: "Browse Items", path: "/browse", icon: Search, public: true },
+    { name: "My Rentals", path: "/rentals", icon: Package, public: false },
+    { name: "List Item", path: "/list-item", icon: PlusCircle, public: false },
+    { name: "Messages", path: "/messages", icon: MessageCircle, badge: unreadMessages || undefined, public: false },
+    { name: "Favorites", path: "/favorites", icon: Heart, public: false },
+    { name: "History", path: "/history", icon: History, public: false },
+    { name: "Profile", path: "/profile", icon: User, public: false },
+    { name: "Settings", path: "/settings", icon: Settings, public: false },
   ];
+
+  const menuItems = isAuthed ? allMenuItems : allMenuItems.filter((m) => m.public);
 
   return (
     <>
@@ -123,33 +130,54 @@ export default function Sidebar() {
         </nav>
 
         <div className="p-4 border-t border-[#2C2C2C]/10">
-          <div className="flex items-center gap-3 px-4 py-3 bg-[#F1F3F5] rounded-xl mb-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile?.full_name || ""} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#1DA5A6] to-[#194774] flex items-center justify-center text-white font-bold">
-                  {initials}
+          {!authLoaded ? null : isAuthed ? (
+            <>
+              <div className="flex items-center gap-3 px-4 py-3 bg-[#F1F3F5] rounded-xl mb-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt={profile?.full_name || ""} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#1DA5A6] to-[#194774] flex items-center justify-center text-white font-bold">
+                      {initials}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#2C2C2C] truncate">
-                {profile?.full_name || "Loading..."}
-              </p>
-              <p className="text-xs text-[#2C2C2C]/60 truncate">
-                {profile?.university || ""}
-              </p>
-            </div>
-          </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#2C2C2C] truncate">
+                    {profile?.full_name || ""}
+                  </p>
+                  <p className="text-xs text-[#2C2C2C]/60 truncate">
+                    {profile?.university || ""}
+                  </p>
+                </div>
+              </div>
 
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all group"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium text-sm">Logout</span>
-          </button>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all group"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="font-medium text-sm">Logout</span>
+              </button>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-semibold rounded-xl hover:shadow-md transition-all"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#1DA5A6] text-[#1DA5A6] font-semibold rounded-xl hover:bg-[#1DA5A6]/5 transition-all"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
     </>

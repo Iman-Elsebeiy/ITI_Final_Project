@@ -43,11 +43,15 @@ export async function updateSession(request: NextRequest) {
     "/privacy",
     "/support",
     "/account-deleted",
+    "/home",
+    "/browse",
   ];
+
+  const publicPrefixes = ["/item/", "/items/", "/api/"];
 
   const isPublicPath =
     publicPaths.some((path) => request.nextUrl.pathname === path) ||
-    request.nextUrl.pathname.startsWith("/api/");
+    publicPrefixes.some((p) => request.nextUrl.pathname.startsWith(p));
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();

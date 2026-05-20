@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
   Building2,
@@ -57,6 +57,8 @@ const roles = [
 
 export default function SetupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "";
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,7 +95,7 @@ export default function SetupPage() {
       return;
     }
 
-    router.push("/home");
+    router.push(redirectTo || "/home");
   };
 
   const handleNext = () => {

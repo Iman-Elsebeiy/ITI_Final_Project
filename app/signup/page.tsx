@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Eye,
@@ -54,6 +54,8 @@ const faculties = [
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,7 +91,7 @@ export default function SignUpPage() {
     }
 
     setIsLoading(false);
-    router.push("/setup");
+    router.push(redirectTo ? `/setup?redirect=${encodeURIComponent(redirectTo)}` : "/setup");
   };
 
   const getCallbackOrigin = () => {
@@ -108,7 +110,7 @@ export default function SignUpPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${getCallbackOrigin()}/auth/callback?next=/home`,
+        redirectTo: `${getCallbackOrigin()}/auth/callback?next=${encodeURIComponent(redirectTo || "/home")}`,
         queryParams: { access_type: "offline", prompt: "consent" },
       },
     });
@@ -429,7 +431,7 @@ export default function SignUpPage() {
           {/* Sign In Link */}
           <p className="text-center text-sm text-[#2C2C2C]/60 mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors">
+            <Link href={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"} className="font-semibold text-[#1DA5A6] hover:text-[#194774] transition-colors">
               Sign In
             </Link>
           </p>
