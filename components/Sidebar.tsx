@@ -64,7 +64,8 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
+        aria-label="Toggle menu"
+        className="fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
       >
         {isMobileMenuOpen ? (
           <X className="w-6 h-6 text-[#2C2C2C]" />
@@ -75,7 +76,7 @@ export default function Sidebar() {
 
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -83,7 +84,7 @@ export default function Sidebar() {
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-40 flex flex-col transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        }`}
       >
         <div className="p-6 border-b border-[#2C2C2C]/10">
           <Link href="/home" className="flex items-center gap-3">

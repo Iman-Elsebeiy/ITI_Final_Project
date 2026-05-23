@@ -59,8 +59,8 @@ export default function RootLayout({
           // Authenticated pages with sidebar
           <div className="flex min-h-screen">
             <Sidebar/>
-            <div className="flex-1 lg:ml-64">
-              <div className="p-6 bg-[#F1F3F5] min-h-screen">{children}</div>
+            <div className="flex-1">
+              <div className="p-6 pt-20 bg-[#F1F3F5] min-h-screen">{children}</div>
             </div>
           </div>
         )}
