@@ -17,13 +17,19 @@ import {
   ArrowUpRight,
   Award,
   Activity,
+  ShieldCheck,
+  Users,
+  Sparkles,
+  Mail,
+  Phone,
+  Send,
 } from "lucide-react";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { getItems } from "@/lib/data/items";
 import { getRentalStats } from "@/lib/data/rentals";
 import { getNotifications } from "@/lib/data/notifications";
 import type { Profile, Item, Notification } from "@/lib/types";
-import { PERIOD_LABELS } from "@/lib/types";
+import { PERIOD_LABELS, CATEGORIES } from "@/lib/types";
 
 export default function HomePage() {
   const router = useRouter();
@@ -39,7 +45,7 @@ export default function HomePage() {
       try {
         const [profileData, itemsData, rentalStats, notifications] = await Promise.allSettled([
           getCurrentProfile(),
-          getItems({ limit: 4 }),
+          getItems({ limit: 8 }),
           getRentalStats(),
           getNotifications(),
         ]);
@@ -49,57 +55,13 @@ export default function HomePage() {
         if (rentalStats.status === "fulfilled") setStats(rentalStats.value);
         if (notifications.status === "fulfilled") setRecentActivity(notifications.value.slice(0, 4));
       } catch {
-        // silently fail — show page with whatever loaded
+        // silently fail
       } finally {
         setLoading(false);
       }
     }
     loadData();
   }, []);
-
-  const firstName = profile?.full_name?.split(" ")[0] || "there";
-
-  const statCards = [
-    {
-      label: "Active Rentals",
-      value: String(stats.activeRentals),
-      change: "Current",
-      icon: Package,
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600",
-    },
-    {
-      label: "Total Earnings",
-      value: `EGP ${stats.totalEarnings.toLocaleString()}`,
-      change: "All time",
-      icon: DollarSign,
-      bgColor: "bg-green-50",
-      textColor: "text-green-600",
-    },
-    {
-      label: "Total Spent",
-      value: `EGP ${stats.totalSpent.toLocaleString()}`,
-      change: "All time",
-      icon: TrendingUp,
-      bgColor: "bg-yellow-50",
-      textColor: "text-yellow-600",
-    },
-    {
-      label: "Items Listed",
-      value: String(stats.itemsListed),
-      change: "Your items",
-      icon: TrendingUp,
-      bgColor: "bg-[#1DA5A6]/10",
-      textColor: "text-[#1DA5A6]",
-    },
-  ];
-
-  const quickActions = [
-    { title: "List New Item", description: "Share your tools and earn", icon: Package, href: "/list-item", color: "from-[#1DA5A6] to-[#194774]" },
-    { title: "Browse Items", description: "Find what you need", icon: Search, href: "/browse", color: "from-blue-500 to-cyan-500" },
-    { title: "My Rentals", description: "Track active rentals", icon: Clock, href: "/rentals", color: "from-green-500 to-emerald-500" },
-    { title: "Messages", description: "Chat with students", icon: MessageCircle, href: "/messages", color: "from-purple-500 to-pink-500" },
-  ];
 
   if (loading) {
     return (
@@ -109,6 +71,28 @@ export default function HomePage() {
     );
   }
 
+  // ================== PUBLIC LANDING (anonymous visitors) ==================
+  if (!profile) {
+    return <PublicLanding items={trendingItems} initialSearch={searchQuery} onSearchChange={setSearchQuery} />;
+  }
+
+  // ================== DASHBOARD (logged-in users) ==================
+  const firstName = profile?.full_name?.split(" ")[0] || "there";
+
+  const statCards = [
+    { label: "Active Rentals", value: String(stats.activeRentals), change: "Current", icon: Package, bgColor: "bg-blue-50", textColor: "text-blue-600" },
+    { label: "Total Earnings", value: `EGP ${stats.totalEarnings.toLocaleString()}`, change: "All time", icon: DollarSign, bgColor: "bg-green-50", textColor: "text-green-600" },
+    { label: "Total Spent", value: `EGP ${stats.totalSpent.toLocaleString()}`, change: "All time", icon: TrendingUp, bgColor: "bg-yellow-50", textColor: "text-yellow-600" },
+    { label: "Items Listed", value: String(stats.itemsListed), change: "Your items", icon: TrendingUp, bgColor: "bg-[#1DA5A6]/10", textColor: "text-[#1DA5A6]" },
+  ];
+
+  const quickActions = [
+    { title: "List New Item", description: "Share your tools and earn", icon: Package, href: "/list-item", color: "from-[#1DA5A6] to-[#194774]" },
+    { title: "Browse Items", description: "Find what you need", icon: Search, href: "/browse", color: "from-blue-500 to-cyan-500" },
+    { title: "My Rentals", description: "Track active rentals", icon: Clock, href: "/rentals", color: "from-green-500 to-emerald-500" },
+    { title: "Messages", description: "Chat with students", icon: MessageCircle, href: "/messages", color: "from-purple-500 to-pink-500" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -116,9 +100,7 @@ export default function HomePage() {
           <h1 className="text-3xl font-extrabold text-[#2C2C2C]">
             Welcome back, <span className="text-gradient">{firstName}!</span>
           </h1>
-          <p className="text-[#2C2C2C]/60 mt-1">
-            Here&apos;s what&apos;s happening with your rentals today
-          </p>
+          <p className="text-[#2C2C2C]/60 mt-1">Here&apos;s what&apos;s happening with your rentals today</p>
         </div>
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2C2C2C]/40" />
@@ -192,7 +174,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {trendingItems.map((item) => {
+              {trendingItems.slice(0, 4).map((item) => {
                 const ownerName = (item.owner as unknown as Profile)?.full_name || "Unknown";
                 const ownerUni = (item.owner as unknown as Profile)?.university || "";
                 const ownerInitials = ownerName.split(" ").map((n) => n[0]).join("").toUpperCase();
@@ -299,24 +281,287 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Activity className="w-6 h-6 text-white" />
+// ============================================================
+// PUBLIC LANDING COMPONENT (Anonymous visitors)
+// ============================================================
+function PublicLanding({
+  items,
+  initialSearch,
+  onSearchChange,
+}: {
+  items: Item[];
+  initialSearch: string;
+  onSearchChange: (v: string) => void;
+}) {
+  const router = useRouter();
+  const [search, setSearch] = useState(initialSearch);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (search.trim()) {
+      router.push(`/browse?q=${encodeURIComponent(search.trim())}`);
+    } else {
+      router.push("/browse");
+    }
+  };
+
+  return (
+    <div className="-m-6 md:-m-8">
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#1DA5A6] via-[#178A8B] to-[#194774] text-white">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#FFC83D] rounded-full blur-3xl"></div>
+        </div>
+        <div className="relative max-w-6xl mx-auto px-6 py-20 md:py-28 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm font-semibold mb-6">
+            <Sparkles className="w-4 h-4 text-[#FFC83D]" />
+            The #1 Student Marketplace in Egypt
           </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-[#2C2C2C] mb-2">Pro Tip: Boost Your Earnings</h3>
-            <p className="text-sm text-[#2C2C2C]/70 leading-relaxed mb-3">
-              Items with detailed descriptions and clear photos get rented 3x faster! Make sure to upload high-quality images and describe the condition accurately.
-            </p>
-            <Link href="/list-item" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-              List an item now
-              <ChevronRight className="w-4 h-4" />
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+            Rent What You Need.<br />
+            <span className="text-[#FFC83D]">Earn From What You Own.</span>
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10">
+            UniTool connects students across universities to rent and lend tools, books, electronics, and more — safely and affordably.
+          </p>
+
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
+            <div className="flex items-center bg-white rounded-2xl shadow-2xl overflow-hidden p-2">
+              <Search className="w-5 h-5 text-[#2C2C2C]/40 ml-3" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); onSearchChange(e.target.value); }}
+                placeholder="Search for cameras, books, calculators..."
+                className="flex-1 px-3 py-3 text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none"
+              />
+              <button type="submit" className="px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                Search
+              </button>
+            </div>
+          </form>
+
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/browse" className="px-8 py-4 bg-white text-[#194774] rounded-xl font-bold hover:bg-[#FFC83D] hover:text-[#2C2C2C] transition-all shadow-lg">
+              Browse Items
+            </Link>
+            <Link href="/signup" className="px-8 py-4 bg-white/10 backdrop-blur border-2 border-white text-white rounded-xl font-bold hover:bg-white hover:text-[#194774] transition-all">
+              Join Free
             </Link>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* CATEGORIES STRIP */}
+      <section className="bg-white border-b border-[#2C2C2C]/10">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex gap-3 overflow-x-auto">
+          {CATEGORIES.slice(0, 8).map((cat) => (
+            <Link
+              key={cat}
+              href={`/browse?category=${encodeURIComponent(cat)}`}
+              className="flex-shrink-0 px-5 py-2.5 bg-[#1DA5A6]/5 hover:bg-[#1DA5A6] hover:text-white text-[#194774] rounded-full text-sm font-semibold transition-all"
+            >
+              {cat}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="bg-[#F9FAFB] py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-[#1DA5A6] font-semibold mb-2 uppercase tracking-wider text-sm">About UniTool</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#2C2C2C] mb-4">
+              Built by Students, For Students
+            </h2>
+            <p className="text-[#2C2C2C]/70 max-w-2xl mx-auto text-lg">
+              We help students save money and earn extra income by sharing the tools, books, and equipment they already own.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: ShieldCheck, title: "Safe & Trusted", desc: "Verified student accounts and secure payments via Stripe.", color: "from-[#1DA5A6] to-[#194774]" },
+              { icon: DollarSign, title: "Affordable Prices", desc: "Rent for a fraction of the cost of buying new.", color: "from-green-500 to-emerald-600" },
+              { icon: Users, title: "Student Community", desc: "Connect with students from your university and across Egypt.", color: "from-[#FFC83D] to-[#FF9500]" },
+            ].map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div key={i} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${f.color} rounded-2xl flex items-center justify-center mb-5 shadow-md`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">{f.title}</h3>
+                  <p className="text-[#2C2C2C]/70 leading-relaxed">{f.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED PRODUCTS */}
+      <section className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+            <div>
+              <p className="text-[#1DA5A6] font-semibold mb-2 uppercase tracking-wider text-sm">Featured</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[#2C2C2C]">Popular This Week</h2>
+            </div>
+            <Link href="/browse" className="flex items-center gap-2 text-[#1DA5A6] font-semibold hover:text-[#194774] transition-colors">
+              View All Items
+              <ChevronRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="bg-[#F9FAFB] rounded-2xl p-16 text-center">
+              <Package className="w-16 h-16 text-[#2C2C2C]/20 mx-auto mb-4" />
+              <p className="text-[#2C2C2C]/60">No items available yet. Be the first to list!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {items.slice(0, 8).map((item) => {
+                const imageUrl = item.image_paths?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
+                return (
+                  <Link key={item.id} href={`/item/${item.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group border border-[#2C2C2C]/5">
+                    <div className="relative h-44 overflow-hidden bg-[#F9FAFB]">
+                      <img src={imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute top-3 left-3">
+                        <span className="px-2.5 py-1 bg-white/95 backdrop-blur rounded-full text-xs font-semibold text-[#194774]">{item.category}</span>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-[#2C2C2C] mb-2 line-clamp-1 group-hover:text-[#1DA5A6] transition-colors">{item.title}</h3>
+                      <div className="flex items-center justify-between pt-2 border-t border-[#2C2C2C]/10">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <span className="text-sm font-bold text-[#2C2C2C]">{item.avg_rating?.toFixed(1) || "New"}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-[#1DA5A6]">EGP {item.price}</p>
+                          <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="bg-[#F9FAFB] py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-[#1DA5A6] font-semibold mb-2 uppercase tracking-wider text-sm">How It Works</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#2C2C2C]">Start in 3 Easy Steps</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { n: "01", title: "Browse & Discover", desc: "Search thousands of items shared by fellow students." },
+              { n: "02", title: "Rent Securely", desc: "Pay safely online and chat with the owner directly." },
+              { n: "03", title: "Use & Return", desc: "Enjoy the item, then return it when you're done." },
+            ].map((s) => (
+              <div key={s.n} className="bg-white rounded-2xl p-8 shadow-sm relative overflow-hidden">
+                <div className="absolute -top-4 -right-4 text-8xl font-extrabold text-[#1DA5A6]/5">{s.n}</div>
+                <div className="relative">
+                  <div className="text-[#1DA5A6] font-bold text-sm mb-3">STEP {s.n}</div>
+                  <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">{s.title}</h3>
+                  <p className="text-[#2C2C2C]/70">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="bg-gradient-to-br from-[#194774] to-[#1DA5A6] text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-[#FFC83D] font-semibold mb-2 uppercase tracking-wider text-sm">Contact Us</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Get In Touch</h2>
+            <p className="text-white/80 max-w-xl mx-auto">
+              Have questions, feedback, or partnership ideas? We&apos;d love to hear from you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+              <Mail className="w-8 h-8 text-[#FFC83D] mx-auto mb-3" />
+              <p className="font-semibold mb-1">Email</p>
+              <p className="text-sm text-white/80">support@unitool.com</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+              <Phone className="w-8 h-8 text-[#FFC83D] mx-auto mb-3" />
+              <p className="font-semibold mb-1">Phone</p>
+              <p className="text-sm text-white/80">+20 100 000 0000</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+              <MessageCircle className="w-8 h-8 text-[#FFC83D] mx-auto mb-3" />
+              <p className="font-semibold mb-1">Support</p>
+              <Link href="/support" className="text-sm text-white/80 hover:text-[#FFC83D]">Visit Help Center</Link>
+            </div>
+          </div>
+
+          <form
+            onSubmit={(e) => { e.preventDefault(); alert("Thanks for reaching out! We'll get back to you soon."); }}
+            className="bg-white/10 backdrop-blur rounded-2xl p-6 md:p-8 space-y-4"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                required
+                type="text"
+                placeholder="Your Name"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D]"
+              />
+              <input
+                required
+                type="email"
+                placeholder="Your Email"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D]"
+              />
+            </div>
+            <textarea
+              required
+              rows={4}
+              placeholder="Your Message"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D] resize-none"
+            />
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FFC83D] text-[#194774] rounded-xl font-bold hover:bg-white transition-all shadow-lg"
+            >
+              <Send className="w-5 h-5" />
+              Send Message
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#0F2E4C] text-white/70 py-10">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left">
+            <p className="text-white font-bold text-lg">UniTool</p>
+            <p className="text-sm">© {new Date().getFullYear()} UniTool. The Student Marketplace.</p>
+          </div>
+          <div className="flex gap-6 text-sm">
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/support" className="hover:text-white">Support</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
