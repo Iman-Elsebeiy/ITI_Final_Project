@@ -26,6 +26,7 @@ A Next.js 16 application migrated from Vercel to Replit with Supabase backend.
   - `favorites.ts` - Favorite toggle, list
   - `messages.ts` - Conversations, messages, unread count
   - `notifications.ts` - Notifications, mark read
+  - `reviews.ts` - Create review (server-derives counterparty, completed-only, one per rental), reviewed-rental-ids
 - `supabase/schema.sql` - Full database schema (10 tables, RLS policies, triggers)
 - `scripts/` - Seed scripts (fix-and-seed.ts for sample items + storage images)
 - `middleware.ts` - Route protection middleware
@@ -68,10 +69,11 @@ All tables have RLS policies. Triggers auto-create profiles and user_settings on
 
 - **Home** (`/home`) - Real stats, recent items, notifications
 - **Browse** (`/browse`) - Real items with search, filter, sort, favorite toggle
-- **Rentals** (`/rentals`) - Real rental data with borrowed/lended tabs
+- **Rentals** (`/rentals`) - Real rental/order data with borrowed/lended tabs; lifecycle actions (Mark Returned/Delivered → completed, Cancel) and a star-rating review modal on completed orders
 - **History** (`/history`) - Completed/cancelled rentals with earnings/spending stats
 - **Favorites** (`/favorites`) - Real favorites with bulk actions
-- **Messages** (`/messages`) - Real conversations and messages
+- **Messages** (`/messages`) - Real conversations and messages, **realtime** (Supabase postgres_changes subscription on `messages`, no refresh needed)
+- **Notifications** (`/notifications`) - Lists notifications with mark-read / mark-all-read; Sidebar shows unread badge
 - **Profile** (`/profile`) - Real profile data and rental stats
 - **Settings** (`/settings`) - Real profile editing, notification/privacy/preference settings saved to DB
 - **List Item** (`/list-item`) - Creates real items in Supabase

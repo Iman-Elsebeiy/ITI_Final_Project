@@ -16,10 +16,12 @@ import {
   Star,
   Filter,
   Search,
+  CheckCircle,
+  X,
 } from "lucide-react";
-import { getUserRentals } from "@/lib/data/rentals";
+import { getUserRentals, updateRentalStatus } from "@/lib/data/rentals";
+import { createReview, getReviewedRentalIds } from "@/lib/data/reviews";
 import type { Rental, Item, Profile } from "@/lib/types";
-import { PERIOD_LABELS } from "@/lib/types";
 
 type RentalWithType = Rental & { _type?: "borrowed" | "lended" };
 
@@ -29,21 +31,69 @@ export default function RentalsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [rentals, setRentals] = useState<RentalWithType[]>([]);
+  const [reviewedIds, setReviewedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<RentalWithType | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  async function load() {
+    try {
+      const [data, reviewed] = await Promise.all([
+        getUserRentals(),
+        getReviewedRentalIds(),
+      ]);
+      setRentals(data as RentalWithType[]);
+      setReviewedIds(reviewed);
+    } catch {
+      // show empty state on error
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        const data = await getUserRentals();
-        setRentals(data as RentalWithType[]);
-      } catch {
-        // show empty state on error
-      } finally {
-        setLoading(false);
-      }
-    }
     load();
   }, []);
+
+  const handleStatusChange = async (id: string, status: string) => {
+    setActionLoading(id);
+    const result = await updateRentalStatus(id, status);
+    if (result.success) {
+      setRentals((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: status as Rental["status"] } : r))
+      );
+    } else if (result.error) {
+      alert(result.error);
+    }
+    setActionLoading(null);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewTarget) return;
+    setSubmittingReview(true);
+    const otherUser =
+      reviewTarget._type === "borrowed"
+        ? (reviewTarget.lender as unknown as Profile)
+        : (reviewTarget.borrower as unknown as Profile);
+    const result = await createReview({
+      rental_id: reviewTarget.id,
+      reviewed_id: otherUser?.id || "",
+      rating: reviewRating,
+      comment: reviewComment.trim() || undefined,
+    });
+    setSubmittingReview(false);
+    if (result.success) {
+      setReviewedIds((prev) => [...prev, reviewTarget.id]);
+      setReviewTarget(null);
+      setReviewRating(5);
+      setReviewComment("");
+    } else if (result.error) {
+      alert(result.error);
+    }
+  };
 
   const filteredRentals = rentals.filter((rental) => {
     const matchesTab = activeTab === "all" || rental._type === activeTab;
@@ -194,14 +244,45 @@ export default function RentalsPage() {
                           <span className="text-[#2C2C2C]/70">{rental.pickup_location || "TBD"}</span>
                         </div>
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex flex-wrap gap-3">
                         <button onClick={() => router.push(`/messages`)} className="flex items-center gap-2 px-4 py-2 bg-[#F1F3F5] text-[#2C2C2C] rounded-lg text-sm font-semibold hover:bg-[#1DA5A6]/10 transition-all">
                           <MessageCircle className="w-4 h-4" />Message
                         </button>
-                        {rental.status === "completed" && (
-                          <button className="flex items-center gap-2 px-4 py-2 bg-[#FFC83D]/10 text-[#FFC83D] rounded-lg text-sm font-semibold hover:bg-[#FFC83D]/20 transition-all">
-                            <Star className="w-4 h-4" />Rate
+
+                        {rental.status === "active" && rental._type === "lended" && (
+                          <button
+                            onClick={() => handleStatusChange(rental.id, "completed")}
+                            disabled={actionLoading === rental.id}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-semibold hover:bg-green-100 transition-all disabled:opacity-50"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            {rental.transaction_type === "sale" ? "Mark Delivered" : "Mark Returned"}
                           </button>
+                        )}
+
+                        {rental.status === "active" && (
+                          <button
+                            onClick={() => handleStatusChange(rental.id, "cancelled")}
+                            disabled={actionLoading === rental.id}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all disabled:opacity-50"
+                          >
+                            <XCircle className="w-4 h-4" />Cancel
+                          </button>
+                        )}
+
+                        {rental.status === "completed" && (
+                          reviewedIds.includes(rental.id) ? (
+                            <span className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-sm font-semibold">
+                              <CheckCircle className="w-4 h-4" />Reviewed
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setReviewTarget(rental)}
+                              className="flex items-center gap-2 px-4 py-2 bg-[#FFC83D]/10 text-[#FFC83D] rounded-lg text-sm font-semibold hover:bg-[#FFC83D]/20 transition-all"
+                            >
+                              <Star className="w-4 h-4" />Rate
+                            </button>
+                          )
                         )}
                       </div>
                     </div>
@@ -210,6 +291,74 @@ export default function RentalsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {reviewTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-[#2C2C2C]">Leave a Review</h3>
+              <button
+                onClick={() => setReviewTarget(null)}
+                aria-label="Close"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2C2C2C]/50 hover:bg-[#F1F3F5] transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-[#2C2C2C]/60 mb-4">
+              How was your experience with{" "}
+              <span className="font-semibold text-[#2C2C2C]">
+                {(reviewTarget._type === "borrowed"
+                  ? (reviewTarget.lender as unknown as Profile)
+                  : (reviewTarget.borrower as unknown as Profile))?.full_name || "the other user"}
+              </span>
+              ?
+            </p>
+
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setReviewRating(star)}
+                  aria-label={`${star} stars`}
+                  className="transition-transform hover:scale-110"
+                >
+                  <Star
+                    className={`w-9 h-9 ${
+                      star <= reviewRating ? "fill-[#FFC83D] text-[#FFC83D]" : "text-gray-300"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Share your experience (optional)"
+              rows={4}
+              className="w-full p-3 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30 transition-all resize-none mb-4"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setReviewTarget(null)}
+                className="flex-1 py-3 bg-[#F1F3F5] text-[#2C2C2C] rounded-xl font-semibold hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitReview}
+                disabled={submittingReview}
+                className="flex-1 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                {submittingReview ? "Submitting..." : "Submit Review"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

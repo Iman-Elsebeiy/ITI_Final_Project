@@ -16,10 +16,12 @@ import {
   Search,
   Heart,
   History,
+  Bell,
 } from "lucide-react";
 import { logout } from "@/app/auth/actions";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { getUnreadMessageCount } from "@/lib/data/messages";
+import { getUnreadNotificationCount } from "@/lib/data/notifications";
 import type { Profile } from "@/lib/types";
 
 export default function Sidebar() {
@@ -27,14 +29,21 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
     getCurrentProfile()
       .then(setProfile)
       .finally(() => setAuthLoaded(true));
-    getUnreadMessageCount().then(setUnreadMessages).catch(() => {});
   }, []);
+
+  // Re-fetch unread badges on every navigation so they don't go stale after the
+  // user reads messages or notifications (the sidebar persists across routes).
+  useEffect(() => {
+    getUnreadMessageCount().then(setUnreadMessages).catch(() => {});
+    getUnreadNotificationCount().then(setUnreadNotifications).catch(() => {});
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -52,6 +61,7 @@ export default function Sidebar() {
     { name: "My Rentals", path: "/rentals", icon: Package, public: false },
     { name: "List Item", path: "/list-item", icon: PlusCircle, public: false },
     { name: "Messages", path: "/messages", icon: MessageCircle, badge: unreadMessages || undefined, public: false },
+    { name: "Notifications", path: "/notifications", icon: Bell, badge: unreadNotifications || undefined, public: false },
     { name: "Favorites", path: "/favorites", icon: Heart, public: false },
     { name: "History", path: "/history", icon: History, public: false },
     { name: "Profile", path: "/profile", icon: User, public: false },

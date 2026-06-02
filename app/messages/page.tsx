@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Search,
@@ -11,6 +11,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { getConversations, getMessages, sendMessage } from "@/lib/data/messages";
+import { createClient } from "@/lib/supabase/client";
 
 type ConversationData = {
   id: string;
@@ -57,6 +58,8 @@ function MessagesContent() {
     load();
   }, [searchParams]);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (selectedConvId) {
       getMessages(selectedConvId).then(({ messages: msgs, currentUserId: uid }) => {
@@ -65,6 +68,53 @@ function MessagesContent() {
       });
     }
   }, [selectedConvId]);
+
+  // Realtime: subscribe to new messages in the open conversation so they appear
+  // instantly without a page refresh.
+  useEffect(() => {
+    if (!selectedConvId) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`messages:${selectedConvId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${selectedConvId}`,
+        },
+        (payload) => {
+          const incoming = payload.new as MessageData;
+          setMessages((prev) =>
+            prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]
+          );
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === incoming.conversation_id
+                ? {
+                    ...c,
+                    last_message: {
+                      content: incoming.content,
+                      created_at: incoming.created_at,
+                      sender_id: incoming.sender_id,
+                    },
+                  }
+                : c
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConvId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const filteredConversations = conversations.filter((conv) =>
     (conv.other_user?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase())
@@ -195,6 +245,7 @@ function MessagesContent() {
                       </div>
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
                 <div className="p-4 border-t border-gray-200 bg-white">
                   <div className="flex gap-2">

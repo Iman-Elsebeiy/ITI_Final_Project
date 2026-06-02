@@ -25,3 +25,19 @@ ALTER TABLE public.rentals
 CREATE UNIQUE INDEX IF NOT EXISTS idx_rentals_stripe_session
   ON public.rentals(stripe_session_id)
   WHERE stripe_session_id IS NOT NULL;
+
+-- 5. Reviews: one review per rental per reviewer (DB-level guard against races)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_rental_reviewer
+  ON public.reviews(rental_id, reviewer_id);
+
+-- 6. Realtime: broadcast new chat messages so the Messages page updates live
+--    without a page refresh. Safe to run repeatedly.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+  END IF;
+END $$;

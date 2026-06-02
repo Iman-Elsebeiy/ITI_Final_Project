@@ -104,6 +104,40 @@ export async function createRental(rentalData: {
 export async function updateRentalStatus(id: string, status: string) {
   try {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+
+    const { data: rental } = await supabase
+      .from("rentals")
+      .select("id, borrower_id, lender_id, status")
+      .eq("id", id)
+      .single();
+
+    if (!rental) return { error: "Order not found" };
+
+    const isLender = rental.lender_id === user.id;
+    const isBorrower = rental.borrower_id === user.id;
+    if (!isLender && !isBorrower) {
+      return { error: "You are not part of this order" };
+    }
+
+    // Server-enforced transition policy — never trust the client UI alone.
+    // - Completing (item returned / delivered) is the lender's confirmation.
+    // - Either party may cancel an order that hasn't finished yet.
+    // - Accepting a pending order is the lender's action.
+    let allowed = false;
+    if (status === "completed") {
+      allowed = isLender && rental.status === "active";
+    } else if (status === "cancelled") {
+      allowed = (isLender || isBorrower) && ["pending", "active"].includes(rental.status);
+    } else if (status === "active") {
+      allowed = isLender && rental.status === "pending";
+    }
+
+    if (!allowed) {
+      return { error: "That action isn't allowed for this order" };
+    }
+
     const { error } = await supabase
       .from("rentals")
       .update({ status })

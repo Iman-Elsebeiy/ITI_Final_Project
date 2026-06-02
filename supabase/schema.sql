@@ -98,6 +98,10 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- One review per rental per reviewer
+CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_rental_reviewer
+  ON public.reviews(rental_id, reviewer_id);
+
 -- 9. Notifications / Activity log
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

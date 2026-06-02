@@ -21,6 +21,17 @@ from inserts. PostgREST joins to `profiles` need explicit FK disambiguation
 (`profiles!rentals_borrower_id_fkey`, `profiles!rentals_lender_id_fkey`) because
 two columns reference `profiles`.
 
+# Order status transitions are server-enforced
+
+`updateRentalStatus` must enforce a transition policy server-side, not just a
+participant check — it's a server action callable outside the UI. Rules: only the
+lender can mark `active → completed` (return/delivery confirmation) or accept
+`pending → active`; either party can `cancel` from `pending`/`active`. A
+participant-only check let a borrower force `completed`.
+
+**Why:** server actions are a public surface; the UI hiding a button is not
+authorization.
+
 # Schema migrations are manual
 
 Schema changes (new columns like `transaction_type`, `platform_fee`,
