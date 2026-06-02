@@ -40,6 +40,7 @@ export async function getItems(options?: {
   search?: string;
   sortBy?: string;
   limit?: number;
+  listingType?: "rent" | "sale";
 }): Promise<Item[]> {
   try {
     const supabase = await createClient();
@@ -51,6 +52,10 @@ export async function getItems(options?: {
 
     if (options?.category) {
       query = query.eq("category", options.category);
+    }
+
+    if (options?.listingType) {
+      query = query.eq("listing_type", options.listingType);
     }
 
     if (options?.search) {
@@ -145,6 +150,7 @@ export async function createItem(itemData: {
   description?: string;
   category: string;
   price: number;
+  listing_type: "rent" | "sale";
   rental_period: string;
   condition: string;
   location?: string;

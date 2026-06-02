@@ -21,13 +21,15 @@ export async function GET(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Check if rental already exists (webhook may have already created it)
+    const isSale = meta.transaction_type === "sale";
+    const totalPrice = parseFloat(meta.total_price);
+    const platformFee = Math.round(totalPrice * 0.1 * 100) / 100;
+
+    // Check if a record already exists for this checkout session (webhook may have created it)
     const { data: existing } = await supabase
       .from("rentals")
       .select("id")
-      .eq("item_id", meta.item_id)
-      .eq("borrower_id", meta.borrower_id)
-      .eq("start_date", meta.start_date)
+      .eq("stripe_session_id", sessionId)
       .maybeSingle();
 
     if (!existing) {
@@ -37,10 +39,13 @@ export async function GET(req: NextRequest) {
         owner_id: meta.lender_id,
         borrower_id: meta.borrower_id,
         lender_id: meta.lender_id,
-        total_price: parseFloat(meta.total_price),
-        start_date: meta.start_date,
-        end_date: meta.end_date,
+        transaction_type: isSale ? "sale" : "rent",
+        total_price: totalPrice,
+        platform_fee: platformFee,
+        start_date: isSale ? null : (meta.start_date || null),
+        end_date: isSale ? null : (meta.end_date || null),
         pickup_location: meta.pickup_location || null,
+        stripe_session_id: sessionId,
         status: "active",
       });
 
@@ -49,16 +54,16 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: rentalError.message }, { status: 500 });
       }
 
-      // Mark item unavailable
+      // Mark item unavailable (sales are permanently sold)
       await supabase.from("items").update({ available: false }).eq("id", meta.item_id);
 
-      // Notify lender
+      // Notify lender / seller
       await supabase.from("notifications").insert({
         user_id: meta.lender_id,
         type: "rental",
         actor_id: meta.borrower_id,
         item_id: meta.item_id,
-        content: "Someone rented your item!",
+        content: isSale ? "Someone bought your item!" : "Someone rented your item!",
       });
     }
 

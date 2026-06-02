@@ -22,6 +22,7 @@ export default function BrowsePage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [listingType, setListingType] = useState<"all" | "rent" | "sale">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("newest");
   const [items, setItems] = useState<Item[]>([]);
@@ -35,7 +36,7 @@ export default function BrowsePage() {
       const category = selectedCategory === "All Categories" ? undefined : selectedCategory;
       const search = searchQuery || undefined;
       const [fetchedItems, count, favorites] = await Promise.allSettled([
-        getItems({ category, search, sortBy }),
+        getItems({ category, search, sortBy, listingType: listingType === "all" ? undefined : listingType }),
         getItemCount(),
         getFavoriteCount(),
       ]);
@@ -47,7 +48,7 @@ export default function BrowsePage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, searchQuery, sortBy]);
+  }, [selectedCategory, searchQuery, sortBy, listingType]);
 
   useEffect(() => {
     loadItems();
@@ -175,6 +176,23 @@ export default function BrowsePage() {
             </button>
           </div>
         </div>
+        <div className="flex gap-2 mt-4">
+          {[
+            { id: "all", label: "All" },
+            { id: "rent", label: "For Rent" },
+            { id: "sale", label: "For Sale" },
+          ].map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => setListingType(opt.id as "all" | "rent" | "sale")}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                listingType === opt.id ? "bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white" : "bg-[#F1F3F5] text-[#2C2C2C]/60 hover:text-[#2C2C2C]"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
@@ -215,9 +233,14 @@ export default function BrowsePage() {
                     >
                       <Heart className={`w-5 h-5 ${item.is_favorite ? "fill-red-500 text-red-500" : "text-[#2C2C2C]/60"}`} />
                     </button>
-                    <span className="absolute top-3 left-3 px-3 py-1 bg-[#1DA5A6] text-white text-xs font-bold rounded-lg">
-                      {CONDITION_LABELS[item.condition] || item.condition}
-                    </span>
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                      <span className={`px-3 py-1 text-xs font-bold rounded-lg ${item.listing_type === "sale" ? "bg-purple-600 text-white" : "bg-[#1DA5A6] text-white"}`}>
+                        {item.listing_type === "sale" ? "For Sale" : "For Rent"}
+                      </span>
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur text-[#2C2C2C] text-xs font-bold rounded-lg">
+                        {CONDITION_LABELS[item.condition] || item.condition}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="p-4 flex-1">
@@ -236,7 +259,7 @@ export default function BrowsePage() {
                   <div className="flex items-center justify-between pt-3 border-t border-[#2C2C2C]/10">
                     <div>
                       <p className="text-2xl font-bold text-[#1DA5A6]">EGP {item.price}</p>
-                      <p className="text-xs text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period] || item.rental_period}</p>
+                      <p className="text-xs text-[#2C2C2C]/60">{item.listing_type === "sale" ? "One-time purchase" : (PERIOD_LABELS[item.rental_period] || item.rental_period)}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-[#1DA5A6] to-[#194774] rounded-full flex items-center justify-center text-white text-xs font-bold">

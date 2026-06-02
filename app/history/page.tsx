@@ -175,7 +175,9 @@ export default function HistoryPage() {
                           <span className={`px-3 py-1 rounded-lg font-semibold ${
                             rental._type === "borrowed" ? "bg-blue-500/10 text-blue-600" : "bg-green-500/10 text-green-600"
                           }`}>
-                            {rental._type === "borrowed" ? "Borrowed" : "Lended"}
+                            {rental.transaction_type === "sale"
+                              ? (rental._type === "borrowed" ? "Bought" : "Sold")
+                              : (rental._type === "borrowed" ? "Borrowed" : "Lended")}
                           </span>
                         </div>
                       </div>
@@ -195,12 +197,14 @@ export default function HistoryPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-blue-500" />
-                        <span className="text-[#2C2C2C]/70">{rental.start_date}</span>
+                        <span className="text-[#2C2C2C]/70">{rental.transaction_type === "sale" ? "Purchased" : rental.start_date}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="w-4 h-4 text-red-500" />
-                        <span className="text-[#2C2C2C]/70">{rental.end_date}</span>
-                      </div>
+                      {rental.transaction_type !== "sale" && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="w-4 h-4 text-red-500" />
+                          <span className="text-[#2C2C2C]/70">{rental.end_date}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -80,8 +80,8 @@ export default function RentalsPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#2C2C2C] mb-2">My Rentals</h1>
-        <p className="text-[#2C2C2C]/60">Track and manage all your rental activities</p>
+        <h1 className="text-3xl font-bold text-[#2C2C2C] mb-2">My Orders & Rentals</h1>
+        <p className="text-[#2C2C2C]/60">Track and manage all your purchases, sales, and rental activities</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -162,7 +162,12 @@ export default function RentalsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
-                          <h3 className="text-lg font-bold text-[#2C2C2C] mb-1">{item?.title || "Item"}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-[#2C2C2C]">{item?.title || "Item"}</h3>
+                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${rental.transaction_type === "sale" ? "bg-purple-100 text-purple-700" : "bg-[#1DA5A6]/10 text-[#1DA5A6]"}`}>
+                              {rental.transaction_type === "sale" ? (rental._type === "borrowed" ? "Bought" : "Sold") : "Rental"}
+                            </span>
+                          </div>
                           <div className="flex items-center gap-4 text-sm text-[#2C2C2C]/60">
                             <span className="flex items-center gap-1">
                               <User className="w-4 h-4" />
@@ -182,7 +187,7 @@ export default function RentalsPage() {
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="w-4 h-4 text-blue-500" />
-                          <span className="text-[#2C2C2C]/70">{rental.start_date} - {rental.end_date}</span>
+                          <span className="text-[#2C2C2C]/70">{rental.transaction_type === "sale" ? "Purchased" : `${rental.start_date} - ${rental.end_date}`}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin className="w-4 h-4 text-red-500" />

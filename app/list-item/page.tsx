@@ -24,6 +24,7 @@ type ListItemFormData = {
   category: string;
   description: string;
   condition: string;
+  listingType: "rent" | "sale";
   price: number;
   rentalPeriod: string;
   availability: string;
@@ -60,10 +61,12 @@ export default function ListItemPage() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<ListItemFormData>();
+  } = useForm<ListItemFormData>({ defaultValues: { listingType: "rent" } });
 
   const selectedCondition = watch("condition");
   const selectedPeriod = watch("rentalPeriod");
+  const listingType = watch("listingType");
+  const isSale = listingType === "sale";
 
   const onSubmit = async (data: ListItemFormData) => {
     setIsSubmitting(true);
@@ -89,10 +92,11 @@ export default function ListItemPage() {
       description: data.description,
       category: data.category,
       price: Number(data.price),
-      rental_period: data.rentalPeriod as "hourly" | "daily" | "weekly" | "monthly" | "semester",
+      listing_type: data.listingType,
+      rental_period: (data.listingType === "sale" ? "daily" : data.rentalPeriod) as "hourly" | "daily" | "weekly" | "monthly" | "semester",
       condition: data.condition,
       location: data.location,
-      deposit: data.deposit ? Number(data.deposit) : 0,
+      deposit: data.listingType === "sale" ? 0 : (data.deposit ? Number(data.deposit) : 0),
       availability_date: data.availability || undefined,
       image_paths: imageUrls.length > 0 ? imageUrls : undefined,
     });
@@ -181,6 +185,29 @@ export default function ListItemPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-white rounded-2xl shadow-md p-6">
           <h2 className="text-xl font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
+            <Tag className="w-5 h-5 text-[#1DA5A6]" />Listing Type
+          </h2>
+          <p className="text-sm text-[#2C2C2C]/60 mb-4">Are you renting this item out or selling it? Each item can only be one or the other.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <label className={`p-5 border-2 rounded-xl cursor-pointer transition-all text-center ${
+              listingType === "rent" ? "border-[#1DA5A6] bg-[#1DA5A6]/5" : "border-[#2C2C2C]/10 hover:border-[#1DA5A6]/30"}`}>
+              <input type="radio" value="rent" {...register("listingType", { required: true })} className="sr-only" />
+              <div className="text-3xl mb-2">🔁</div>
+              <p className="font-bold text-[#2C2C2C]">Rent Out</p>
+              <p className="text-xs text-[#2C2C2C]/60 mt-1">Earn recurring income per period</p>
+            </label>
+            <label className={`p-5 border-2 rounded-xl cursor-pointer transition-all text-center ${
+              listingType === "sale" ? "border-[#1DA5A6] bg-[#1DA5A6]/5" : "border-[#2C2C2C]/10 hover:border-[#1DA5A6]/30"}`}>
+              <input type="radio" value="sale" {...register("listingType", { required: true })} className="sr-only" />
+              <div className="text-3xl mb-2">🏷️</div>
+              <p className="font-bold text-[#2C2C2C]">Sell</p>
+              <p className="text-xs text-[#2C2C2C]/60 mt-1">One-time sale, item is sold once</p>
+            </label>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-6">
+          <h2 className="text-xl font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
             <ImageIcon className="w-5 h-5 text-[#1DA5A6]" />Item Photos
           </h2>
           <div className="space-y-4">
@@ -266,11 +293,11 @@ export default function ListItemPage() {
 
         <div className="bg-white rounded-2xl shadow-md p-6">
           <h2 className="text-xl font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-[#1DA5A6]" />Pricing & Rental Period
+            <DollarSign className="w-5 h-5 text-[#1DA5A6]" />{isSale ? "Pricing" : "Pricing & Rental Period"}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Rental Price <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">{isSale ? "Sale Price" : "Rental Price"} <span className="text-red-500">*</span></label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#2C2C2C]/60">EGP</span>
                 <input type="number" {...register("price", { required: "Price is required", min: { value: 1, message: "Price must be at least 1 EGP" } })}
@@ -278,29 +305,33 @@ export default function ListItemPage() {
               </div>
               {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Security Deposit <span className="text-[#2C2C2C]/40">(Optional)</span></label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#2C2C2C]/60">EGP</span>
-                <input type="number" {...register("deposit", { min: 0 })} placeholder="100"
-                  className="w-full h-12 pl-16 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30 transition-all" />
+            {!isSale && (
+              <div>
+                <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Security Deposit <span className="text-[#2C2C2C]/40">(Optional)</span></label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#2C2C2C]/60">EGP</span>
+                  <input type="number" {...register("deposit", { min: 0 })} placeholder="100"
+                    className="w-full h-12 pl-16 pr-4 bg-[#F1F3F5] rounded-xl text-sm text-[#2C2C2C] placeholder:text-[#2C2C2C]/40 focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30 transition-all" />
+                </div>
               </div>
-            </div>
+            )}
           </div>
-          <div className="mt-4">
-            <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Rental Period <span className="text-red-500">*</span></label>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {rentalPeriods.map((period) => (
-                <label key={period.value} className={`p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
-                  selectedPeriod === period.value ? "border-[#1DA5A6] bg-[#1DA5A6]/5" : "border-[#2C2C2C]/10 hover:border-[#1DA5A6]/30"}`}>
-                  <input type="radio" value={period.value} {...register("rentalPeriod", { required: "Rental period is required" })} className="sr-only" />
-                  <div className="text-2xl mb-1">{period.icon}</div>
-                  <p className="text-xs font-semibold text-[#2C2C2C]">{period.label}</p>
-                </label>
-              ))}
+          {!isSale && (
+            <div className="mt-4">
+              <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Rental Period <span className="text-red-500">*</span></label>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {rentalPeriods.map((period) => (
+                  <label key={period.value} className={`p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
+                    selectedPeriod === period.value ? "border-[#1DA5A6] bg-[#1DA5A6]/5" : "border-[#2C2C2C]/10 hover:border-[#1DA5A6]/30"}`}>
+                    <input type="radio" value={period.value} {...register("rentalPeriod", { required: !isSale ? "Rental period is required" : false })} className="sr-only" />
+                    <div className="text-2xl mb-1">{period.icon}</div>
+                    <p className="text-xs font-semibold text-[#2C2C2C]">{period.label}</p>
+                  </label>
+                ))}
+              </div>
+              {errors.rentalPeriod && <p className="text-red-500 text-xs mt-1">{errors.rentalPeriod.message}</p>}
             </div>
-            {errors.rentalPeriod && <p className="text-red-500 text-xs mt-1">{errors.rentalPeriod.message}</p>}
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl shadow-md p-6">

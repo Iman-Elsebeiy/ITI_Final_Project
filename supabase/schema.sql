@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.items (
   description TEXT,
   category TEXT NOT NULL,
   price NUMERIC(10,2) NOT NULL,
+  listing_type TEXT NOT NULL DEFAULT 'rent' CHECK (listing_type IN ('rent', 'sale')),
   rental_period TEXT NOT NULL CHECK (rental_period IN ('hourly', 'daily', 'weekly', 'monthly', 'semester')),
   condition TEXT NOT NULL CHECK (condition IN ('new', 'like-new', 'excellent', 'good', 'fair')),
   location TEXT,
@@ -41,10 +42,13 @@ CREATE TABLE IF NOT EXISTS public.rentals (
   borrower_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   lender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('active', 'pending', 'completed', 'cancelled')),
+  transaction_type TEXT NOT NULL DEFAULT 'rent' CHECK (transaction_type IN ('rent', 'sale')),
   total_price NUMERIC(10,2) NOT NULL,
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
+  platform_fee NUMERIC(10,2) NOT NULL DEFAULT 0,
+  start_date DATE,
+  end_date DATE,
   pickup_location TEXT,
+  stripe_session_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

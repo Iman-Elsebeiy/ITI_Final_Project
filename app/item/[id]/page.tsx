@@ -70,6 +70,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
   const owner = item?.owner as unknown as Profile | undefined;
   const isOwner = currentUserId && item && currentUserId === item.owner_id;
   const images = item?.image_paths?.length ? item.image_paths : [""];
+  const isSale = item?.listing_type === "sale";
 
   const calcTotal = () => {
     if (!startDate || !endDate || !item) return null;
@@ -105,12 +106,13 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
   };
 
   const handleRent = async () => {
-    if (!item || !startDate || !endDate) return;
+    if (!item) return;
+    if (!isSale && (!startDate || !endDate)) return;
     if (!currentUserId) {
       router.push(`/login?redirect=${encodeURIComponent(`/item/${item.id}`)}`);
       return;
     }
-    const total = calcTotal();
+    const total = isSale ? item.price : calcTotal();
     if (!total) return;
     setRentLoading(true);
     setRentError("");
@@ -122,8 +124,9 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
           item_id: item.id,
           lender_id: item.owner_id,
           total_price: total,
-          start_date: startDate,
-          end_date: endDate,
+          transaction_type: isSale ? "sale" : "rent",
+          start_date: isSale ? null : startDate,
+          end_date: isSale ? null : endDate,
           pickup_location: item.location || "",
           item_title: item.title,
         }),
@@ -234,11 +237,14 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-[#2C2C2C]/60">{CATEGORY_ICONS[item.category] || ""} {item.category}</span>
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isSale ? "bg-purple-100 text-purple-700" : "bg-[#1DA5A6]/10 text-[#1DA5A6]"}`}>
+                {isSale ? "For Sale" : "For Rent"}
+              </span>
             </div>
             <h1 className="text-2xl font-bold text-[#2C2C2C] mb-3">{item.title}</h1>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-[#1DA5A6]">EGP {item.price}</span>
-              <span className="text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period]}</span>
+              {!isSale && <span className="text-[#2C2C2C]/60">{PERIOD_LABELS[item.rental_period]}</span>}
             </div>
             {item.deposit > 0 && (
               <p className="text-sm text-[#2C2C2C]/60 mt-1 flex items-center gap-1">
@@ -273,13 +279,15 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
                 <p className="text-sm font-semibold text-[#2C2C2C]">{CONDITION_LABELS[item.condition]}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 bg-[#F1F3F5] rounded-xl">
-              <Clock className="w-4 h-4 text-[#1DA5A6] flex-shrink-0" />
-              <div>
-                <p className="text-xs text-[#2C2C2C]/60">Rental Period</p>
-                <p className="text-sm font-semibold text-[#2C2C2C]">{PERIOD_LABELS[item.rental_period]}</p>
+            {!isSale && (
+              <div className="flex items-center gap-2 p-3 bg-[#F1F3F5] rounded-xl">
+                <Clock className="w-4 h-4 text-[#1DA5A6] flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-[#2C2C2C]/60">Rental Period</p>
+                  <p className="text-sm font-semibold text-[#2C2C2C]">{PERIOD_LABELS[item.rental_period]}</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {item.description && (
@@ -326,7 +334,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
               <button onClick={() => setShowRentModal(true)} disabled={!item.available}
                 className="flex-1 h-14 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 <ShoppingCart className="w-5 h-5" />
-                {item.available ? "Rent Now" : "Not Available"}
+                {item.available ? (isSale ? "Buy Now" : "Rent Now") : (isSale ? "Sold" : "Not Available")}
               </button>
               <button onClick={handleContact} disabled={contactLoading}
                 className="flex-1 h-14 bg-white border-2 border-[#1DA5A6] text-[#1DA5A6] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#1DA5A6]/5 transition-all disabled:opacity-50">
@@ -356,9 +364,43 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">Rental Request Sent!</h3>
-                <p className="text-[#2C2C2C]/60">Redirecting to your rentals...</p>
+                <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">{isSale ? "Purchase Started!" : "Rental Request Sent!"}</h3>
+                <p className="text-[#2C2C2C]/60">Redirecting...</p>
               </div>
+            ) : isSale ? (
+              <>
+                <h3 className="text-xl font-bold text-[#2C2C2C] mb-1">Buy This Item</h3>
+                <p className="text-sm text-[#2C2C2C]/60 mb-6">{item.title}</p>
+
+                <div className="space-y-4">
+                  <div className="p-4 bg-[#1DA5A6]/5 border border-[#1DA5A6]/20 rounded-xl">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#2C2C2C]/70">Total Price</span>
+                      <span className="text-xl font-bold text-[#1DA5A6]">EGP {item.price.toFixed(2)}</span>
+                    </div>
+                    <p className="text-xs text-[#2C2C2C]/50 mt-2">This is a one-time purchase. Once bought, the item is marked as sold.</p>
+                  </div>
+
+                  {rentError && (
+                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {rentError}
+                    </div>
+                  )}
+
+                  <button onClick={handleRent} disabled={rentLoading}
+                    className="w-full h-14 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    {rentLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-5 h-5" />
+                        Confirm Purchase — EGP {item.price.toFixed(2)}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <h3 className="text-xl font-bold text-[#2C2C2C] mb-1">Rent This Item</h3>

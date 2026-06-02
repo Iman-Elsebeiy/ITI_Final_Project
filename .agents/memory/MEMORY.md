@@ -1,0 +1,1 @@
+- [Rentals table quirks](rentals-table-quirks.md) — live DB keeps legacy NOT NULL renter_id/owner_id (not in schema.sql); inserts must set them. Migrations are manual via Supabase SQL Editor.

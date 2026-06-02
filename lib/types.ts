@@ -18,6 +18,7 @@ export type Item = {
   description: string | null;
   category: string;
   price: number;
+  listing_type: "rent" | "sale";
   rental_period: "hourly" | "daily" | "weekly" | "monthly" | "semester";
   condition: "new" | "like-new" | "excellent" | "good" | "fair";
   location: string | null;
@@ -39,9 +40,11 @@ export type Rental = {
   borrower_id: string;
   lender_id: string;
   status: "active" | "pending" | "completed" | "cancelled";
+  transaction_type: "rent" | "sale";
   total_price: number;
-  start_date: string;
-  end_date: string;
+  platform_fee: number;
+  start_date: string | null;
+  end_date: string | null;
   pickup_location: string | null;
   created_at: string;
   updated_at: string;
@@ -121,6 +124,8 @@ export type UserSettings = {
   created_at: string;
   updated_at: string;
 };
+
+export const PLATFORM_COMMISSION_RATE = 0.1;
 
 export const PERIOD_LABELS: Record<string, string> = {
   hourly: "Per Hour",
