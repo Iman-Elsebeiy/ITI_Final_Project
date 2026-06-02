@@ -26,18 +26,38 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_rentals_stripe_session
   ON public.rentals(stripe_session_id)
   WHERE stripe_session_id IS NOT NULL;
 
--- 5. Reviews: one review per rental per reviewer (DB-level guard against races)
+-- 5. Reviews: create the table if it doesn't exist yet, then guarantee
+--    one review per rental per reviewer (DB-level guard against races).
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  rental_id UUID NOT NULL REFERENCES public.rentals(id) ON DELETE CASCADE,
+  reviewer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  reviewed_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON public.reviews;
+CREATE POLICY "Reviews are viewable by everyone" ON public.reviews FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can create reviews" ON public.reviews;
+CREATE POLICY "Users can create reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_rental_reviewer
   ON public.reviews(rental_id, reviewer_id);
 
 -- 6. Realtime: broadcast new chat messages so the Messages page updates live
---    without a page refresh. Safe to run repeatedly.
+--    without a page refresh. Only runs if the messages table exists.
 DO $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'messages'
-  ) THEN
+  IF to_regclass('public.messages') IS NOT NULL
+     AND NOT EXISTS (
+       SELECT 1 FROM pg_publication_tables
+       WHERE pubname = 'supabase_realtime' AND tablename = 'messages'
+     ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
   END IF;
 END $$;
