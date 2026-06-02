@@ -182,6 +182,44 @@ export async function verifyResetOtp(email: string, token: string) {
   }
 }
 
+export async function changePassword(currentPassword: string, newPassword: string) {
+  try {
+    if (!currentPassword || !newPassword) {
+      return { error: "Please fill in all password fields." };
+    }
+    if (newPassword.length < 6) {
+      return { error: "New password must be at least 6 characters." };
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { error: "You must be signed in to change your password." };
+    }
+
+    // Verify the current password by re-authenticating.
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (verifyError) {
+      return { error: "Current password is incorrect." };
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      return { error: error.message };
+    }
+
+    return { success: true };
+  } catch {
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+
 export async function resetPassword(password: string) {
   try {
     const supabase = await createClient();

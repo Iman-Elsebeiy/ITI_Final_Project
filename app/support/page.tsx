@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { createSupportTicket } from "@/lib/data/support";
 import {
   ArrowLeft,
   MessageCircle,
@@ -142,12 +143,28 @@ export default function SupportPage() {
     formState: { errors },
   } = useForm<SupportFormData>();
 
+  const [submitError, setSubmitError] = useState("");
+
   const onSubmit = async (data: SupportFormData) => {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Support ticket:", data);
+    setSubmitError("");
+
+    const result = await createSupportTicket({
+      name: data.name,
+      email: data.email,
+      subject: data.subject,
+      category: data.category,
+      message: data.message,
+      source: "support",
+    });
+
     setIsSubmitting(false);
+
+    if (result?.error) {
+      setSubmitError(result.error);
+      return;
+    }
+
     setSubmitSuccess(true);
     reset();
 
@@ -355,6 +372,13 @@ export default function SupportPage() {
                       We'll respond within 24 hours
                     </p>
                   </div>
+                </div>
+              )}
+
+              {submitError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm font-semibold text-red-900">{submitError}</p>
                 </div>
               )}
 

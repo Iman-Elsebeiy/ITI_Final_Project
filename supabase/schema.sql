@@ -136,6 +136,20 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 11. Support / contact form submissions
+CREATE TABLE IF NOT EXISTS public.support_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  category TEXT,
+  subject TEXT,
+  message TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'support',
+  status TEXT NOT NULL DEFAULT 'open',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ===== INDEXES =====
 CREATE INDEX IF NOT EXISTS idx_items_owner ON public.items(owner_id);
 CREATE INDEX IF NOT EXISTS idx_items_category ON public.items(category);
@@ -203,6 +217,7 @@ ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: anyone can read, only owner can update
 CREATE POLICY "Profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);

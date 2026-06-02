@@ -28,6 +28,7 @@ import { getCurrentProfile } from "@/lib/data/profile";
 import { getItems } from "@/lib/data/items";
 import { getRentalStats } from "@/lib/data/rentals";
 import { getNotifications } from "@/lib/data/notifications";
+import { createSupportTicket } from "@/lib/data/support";
 import type { Profile, Item, Notification } from "@/lib/types";
 import { PERIOD_LABELS, CATEGORIES } from "@/lib/types";
 
@@ -300,6 +301,32 @@ function PublicLanding({
   const router = useRouter();
   const [search, setSearch] = useState(initialSearch);
 
+  const [contact, setContact] = useState({ name: "", email: "", message: "" });
+  const [contactSending, setContactSending] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
+  const [contactError, setContactError] = useState("");
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactError("");
+    setContactSending(true);
+    const result = await createSupportTicket({
+      name: contact.name,
+      email: contact.email,
+      message: contact.message,
+      subject: "Contact form message",
+      source: "contact",
+    });
+    setContactSending(false);
+    if (result?.error) {
+      setContactError(result.error);
+      return;
+    }
+    setContact({ name: "", email: "", message: "" });
+    setContactSuccess(true);
+    setTimeout(() => setContactSuccess(false), 5000);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (search.trim()) {
@@ -514,20 +541,34 @@ function PublicLanding({
           </div>
 
           <form
-            onSubmit={(e) => { e.preventDefault(); alert("Thanks for reaching out! We'll get back to you soon."); }}
+            onSubmit={handleContactSubmit}
             className="bg-white/10 backdrop-blur rounded-2xl p-6 md:p-8 space-y-4"
           >
+            {contactSuccess && (
+              <div className="px-4 py-3 bg-[#FFC83D]/20 border border-[#FFC83D]/40 rounded-xl text-sm font-semibold text-white">
+                Thanks for reaching out! We&apos;ll get back to you soon.
+              </div>
+            )}
+            {contactError && (
+              <div className="px-4 py-3 bg-red-500/20 border border-red-400/40 rounded-xl text-sm font-semibold text-white">
+                {contactError}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 required
                 type="text"
                 placeholder="Your Name"
+                value={contact.name}
+                onChange={(e) => setContact({ ...contact, name: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D]"
               />
               <input
                 required
                 type="email"
                 placeholder="Your Email"
+                value={contact.email}
+                onChange={(e) => setContact({ ...contact, email: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D]"
               />
             </div>
@@ -535,14 +576,17 @@ function PublicLanding({
               required
               rows={4}
               placeholder="Your Message"
+              value={contact.message}
+              onChange={(e) => setContact({ ...contact, message: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#FFC83D] resize-none"
             />
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FFC83D] text-[#194774] rounded-xl font-bold hover:bg-white transition-all shadow-lg"
+              disabled={contactSending}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FFC83D] text-[#194774] rounded-xl font-bold hover:bg-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-5 h-5" />
-              Send Message
+              {contactSending ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>

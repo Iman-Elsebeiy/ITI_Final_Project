@@ -19,7 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { logout } from "@/app/auth/actions";
+import { logout, changePassword } from "@/app/auth/actions";
 import { getCurrentProfile, updateProfile, getUserSettings, updateUserSettings, deleteAccount, uploadAvatar, removeAvatar } from "@/lib/data/profile";
 import type { Profile, UserSettings } from "@/lib/types";
 
@@ -36,6 +36,44 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    next: "",
+    confirm: "",
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    if (!passwordData.current || !passwordData.next || !passwordData.confirm) {
+      setPasswordError("Please fill in all password fields.");
+      return;
+    }
+    if (passwordData.next.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+    if (passwordData.next !== passwordData.confirm) {
+      setPasswordError("New passwords don't match.");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    const result = await changePassword(passwordData.current, passwordData.next);
+    setIsChangingPassword(false);
+
+    if (result?.error) {
+      setPasswordError(result.error);
+      return;
+    }
+
+    setPasswordData({ current: "", next: "", confirm: "" });
+    setPasswordSuccess(true);
+    setTimeout(() => setPasswordSuccess(false), 4000);
+  };
 
   const [profileData, setProfileData] = useState({
     fullName: "",
@@ -368,20 +406,39 @@ export default function SettingsPage() {
                     <div>
                       <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Current Password</label>
                       <input type="password" placeholder="Enter current password"
+                        value={passwordData.current}
+                        onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
                         className="w-full h-12 px-4 bg-white rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">New Password</label>
                       <input type="password" placeholder="Enter new password"
+                        value={passwordData.next}
+                        onChange={(e) => setPasswordData({ ...passwordData, next: e.target.value })}
                         className="w-full h-12 px-4 bg-white rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">Confirm New Password</label>
                       <input type="password" placeholder="Confirm new password"
+                        value={passwordData.confirm}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
                         className="w-full h-12 px-4 bg-white rounded-xl text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1DA5A6]/30" />
                     </div>
-                    <button className="px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                      Update Password
+                    {passwordError && (
+                      <p className="text-red-500 text-sm flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />{passwordError}
+                      </p>
+                    )}
+                    {passwordSuccess && (
+                      <p className="text-green-600 text-sm flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />Password updated successfully.
+                      </p>
+                    )}
+                    <button
+                      onClick={handleChangePassword}
+                      disabled={isChangingPassword}
+                      className="px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isChangingPassword ? "Updating..." : "Update Password"}
                     </button>
                   </div>
                 </div>
