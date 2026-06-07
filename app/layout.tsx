@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import AssistantWidget from "@/components/AssistantWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,9 @@ export default function RootLayout({
 
   const isPublicPage = publicPages.includes(pathname);
 
+  // Show the AI assistant everywhere except the pure auth/setup forms
+  const hideAssistant = ["/login", "/signup", "/forgot-password", "/setup"].includes(pathname);
+
   return (
     <html
       lang="en"
@@ -64,6 +68,7 @@ export default function RootLayout({
             </div>
           </div>
         )}
+        {!hideAssistant && <AssistantWidget />}
       </body>
     </html>
   );
