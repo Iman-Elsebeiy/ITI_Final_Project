@@ -158,6 +158,8 @@ CREATE INDEX IF NOT EXISTS idx_rentals_borrower ON public.rentals(borrower_id);
 CREATE INDEX IF NOT EXISTS idx_rentals_lender ON public.rentals(lender_id);
 CREATE INDEX IF NOT EXISTS idx_rentals_item ON public.rentals(item_id);
 CREATE INDEX IF NOT EXISTS idx_rentals_status ON public.rentals(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rentals_stripe_session
+  ON public.rentals(stripe_session_id) WHERE stripe_session_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON public.favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON public.messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications(user_id);
@@ -240,21 +242,63 @@ CREATE POLICY "Users can view own favorites" ON public.favorites FOR SELECT USIN
 CREATE POLICY "Users can add favorites" ON public.favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can remove favorites" ON public.favorites FOR DELETE USING (auth.uid() = user_id);
 
+-- SECURITY DEFINER membership check — prevents infinite recursion in the
+-- conversation_participants RLS policy (a policy on that table that queries
+-- the same table recurses). Running the check inside a definer function
+-- bypasses RLS, breaking the cycle.
+CREATE OR REPLACE FUNCTION public.is_conversation_participant(conv_id uuid, uid uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.conversation_participants
+    WHERE conversation_id = conv_id AND user_id = uid
+  );
+$$;
+
+-- Read receipts without granting broad UPDATE on messages: a participant marks
+-- the OTHER party's messages as read via this definer function, so the message
+-- UPDATE policy can stay restricted to the original sender.
+CREATE OR REPLACE FUNCTION public.mark_conversation_read(conv_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF auth.uid() IS NULL OR NOT public.is_conversation_participant(conv_id, auth.uid()) THEN
+    RAISE EXCEPTION 'Not a participant of this conversation';
+  END IF;
+  UPDATE public.messages
+    SET status = 'read'
+    WHERE conversation_id = conv_id
+      AND sender_id <> auth.uid()
+      AND status <> 'read';
+END;
+$$;
+
 -- Conversations: participants only
 CREATE POLICY "Users can view own conversations" ON public.conversations FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.conversation_participants WHERE conversation_id = id AND user_id = auth.uid()));
+  USING (public.is_conversation_participant(id, auth.uid()));
 CREATE POLICY "Users can create conversations" ON public.conversations FOR INSERT WITH CHECK (true);
+CREATE POLICY "Participants can update conversations" ON public.conversations FOR UPDATE
+  USING (public.is_conversation_participant(id, auth.uid()));
 
 -- Conversation participants
 CREATE POLICY "Users can view conversation participants" ON public.conversation_participants FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.conversation_participants cp WHERE cp.conversation_id = conversation_id AND cp.user_id = auth.uid()));
+  USING (public.is_conversation_participant(conversation_id, auth.uid()));
 CREATE POLICY "Users can add participants" ON public.conversation_participants FOR INSERT WITH CHECK (true);
 
 -- Messages: conversation participants can view/send
 CREATE POLICY "Users can view conversation messages" ON public.messages FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.conversation_participants WHERE conversation_id = messages.conversation_id AND user_id = auth.uid()));
+  USING (public.is_conversation_participant(conversation_id, auth.uid()));
 CREATE POLICY "Users can send messages" ON public.messages FOR INSERT
-  WITH CHECK (auth.uid() = sender_id AND EXISTS (SELECT 1 FROM public.conversation_participants WHERE conversation_id = messages.conversation_id AND user_id = auth.uid()));
+  WITH CHECK (auth.uid() = sender_id AND public.is_conversation_participant(conversation_id, auth.uid()));
+-- Only the original sender can directly update a message; read-status changes
+-- for the other party go through mark_conversation_read().
 CREATE POLICY "Users can update own messages" ON public.messages FOR UPDATE
   USING (auth.uid() = sender_id);
 

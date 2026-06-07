@@ -77,12 +77,7 @@ export async function getMessages(conversationId: string) {
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
 
-    await supabase
-      .from("messages")
-      .update({ status: "read" })
-      .eq("conversation_id", conversationId)
-      .neq("sender_id", user.id)
-      .neq("status", "read");
+    await supabase.rpc("mark_conversation_read", { conv_id: conversationId });
 
     return { messages: data || [], currentUserId: user.id };
   } catch {
@@ -112,6 +107,24 @@ export async function sendMessage(conversationId: string, content: string) {
       .from("conversations")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", conversationId);
+
+    // Notify the other participant(s) of the new message.
+    const { data: others } = await supabase
+      .from("conversation_participants")
+      .select("user_id")
+      .eq("conversation_id", conversationId)
+      .neq("user_id", user.id);
+
+    if (others && others.length > 0) {
+      await supabase.from("notifications").insert(
+        others.map((o: { user_id: string }) => ({
+          user_id: o.user_id,
+          type: "message",
+          actor_id: user.id,
+          content: "You have a new message",
+        }))
+      );
+    }
 
     return { success: true, data };
   } catch {
