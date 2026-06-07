@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { getUserRentals, updateRentalStatus } from "@/lib/data/rentals";
 import { createReview, getReviewedRentalIds } from "@/lib/data/reviews";
+import { getOrCreateConversation } from "@/lib/data/messages";
 import type { Rental, Item, Profile } from "@/lib/types";
 
 type RentalWithType = Rental & { _type?: "borrowed" | "lended" };
@@ -57,6 +58,25 @@ export default function RentalsPage() {
   useEffect(() => {
     load();
   }, []);
+
+  const handleMessage = async (rental: RentalWithType) => {
+    const other =
+      rental._type === "borrowed"
+        ? (rental.lender as unknown as Profile)
+        : (rental.borrower as unknown as Profile);
+    if (!other?.id) {
+      router.push(`/messages`);
+      return;
+    }
+    setActionLoading(`msg-${rental.id}`);
+    const result = await getOrCreateConversation(other.id);
+    setActionLoading(null);
+    if (result.conversationId) {
+      router.push(`/messages?conv=${result.conversationId}`);
+    } else {
+      router.push(`/messages`);
+    }
+  };
 
   const handleStatusChange = async (id: string, status: string) => {
     setActionLoading(id);
@@ -245,8 +265,8 @@ export default function RentalsPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-3">
-                        <button onClick={() => router.push(`/messages`)} className="flex items-center gap-2 px-4 py-2 bg-[#F1F3F5] text-[#2C2C2C] rounded-lg text-sm font-semibold hover:bg-[#1DA5A6]/10 transition-all">
-                          <MessageCircle className="w-4 h-4" />Message
+                        <button onClick={() => handleMessage(rental)} disabled={actionLoading === `msg-${rental.id}`} className="flex items-center gap-2 px-4 py-2 bg-[#F1F3F5] text-[#2C2C2C] rounded-lg text-sm font-semibold hover:bg-[#1DA5A6]/10 transition-all disabled:opacity-50">
+                          <MessageCircle className="w-4 h-4" />{actionLoading === `msg-${rental.id}` ? "Opening..." : "Message"}
                         </button>
 
                         {rental.status === "active" && rental._type === "lended" && (
