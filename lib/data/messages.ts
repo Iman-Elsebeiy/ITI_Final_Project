@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function getConversations() {
   try {
@@ -139,15 +140,21 @@ export async function getOrCreateConversation(otherUserId: string): Promise<{ co
     if (!user) return { error: "Not authenticated" };
     if (user.id === otherUserId) return { error: "Cannot message yourself" };
 
+    // Use the admin client for participant lookups and conversation creation.
+    // The live DB's RLS INSERT policy on `conversations`/`conversation_participants`
+    // blocks regular users, so creation must run with the service role (the user
+    // is already authenticated above, and both participants are controlled here).
+    const admin = createAdminClient();
+
     // Find existing conversation between these two users
-    const { data: myParticipations } = await supabase
+    const { data: myParticipations } = await admin
       .from("conversation_participants")
       .select("conversation_id")
       .eq("user_id", user.id);
 
     if (myParticipations && myParticipations.length > 0) {
       const myConvIds = myParticipations.map((p: { conversation_id: string }) => p.conversation_id);
-      const { data: otherParticipations } = await supabase
+      const { data: otherParticipations } = await admin
         .from("conversation_participants")
         .select("conversation_id")
         .eq("user_id", otherUserId)
@@ -159,7 +166,7 @@ export async function getOrCreateConversation(otherUserId: string): Promise<{ co
     }
 
     // Create new conversation
-    const { data: conv, error: convError } = await supabase
+    const { data: conv, error: convError } = await admin
       .from("conversations")
       .insert({})
       .select()
@@ -167,10 +174,12 @@ export async function getOrCreateConversation(otherUserId: string): Promise<{ co
 
     if (convError || !conv) return { error: convError?.message || "Failed to create conversation" };
 
-    await supabase.from("conversation_participants").insert([
+    const { error: partError } = await admin.from("conversation_participants").insert([
       { conversation_id: conv.id, user_id: user.id },
       { conversation_id: conv.id, user_id: otherUserId },
     ]);
+
+    if (partError) return { error: partError.message };
 
     return { conversationId: conv.id };
   } catch {
