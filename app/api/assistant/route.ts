@@ -209,7 +209,6 @@ export async function POST(req: NextRequest) {
       messages: convo,
       tools,
       tool_choice: "auto",
-      temperature: 0.4,
     });
 
     const choice = first.choices[0]?.message;
@@ -257,7 +256,6 @@ export async function POST(req: NextRequest) {
       const second = await openai.chat.completions.create({
         model: ASSISTANT_MODEL,
         messages: convo,
-        temperature: 0.4,
       });
       const reply = second.choices[0]?.message?.content || "";
       return NextResponse.json({ reply, items: items.slice(0, 6) });
