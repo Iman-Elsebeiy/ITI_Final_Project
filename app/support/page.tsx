@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { createSupportTicket } from "@/lib/data/support";
+import { getCurrentProfile } from "@/lib/data/profile";
 import {
   ArrowLeft,
   MessageCircle,
@@ -135,6 +136,7 @@ export default function SupportPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const {
     register,
@@ -144,6 +146,23 @@ export default function SupportPage() {
   } = useForm<SupportFormData>();
 
   const [submitError, setSubmitError] = useState("");
+
+  // When the user is logged in, prefill name/email from their profile.
+  useEffect(() => {
+    getCurrentProfile()
+      .then((profile) => {
+        if (!profile) return;
+        setIsLoggedIn(true);
+        reset({
+          name: profile.full_name || "",
+          email: profile.email || "",
+          subject: "",
+          category: "",
+          message: "",
+        });
+      })
+      .catch(() => {});
+  }, [reset]);
 
   const onSubmit = async (data: SupportFormData) => {
     setIsSubmitting(true);
@@ -191,13 +210,15 @@ export default function SupportPage() {
       {/* Header */}
       <div className="bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Link>
+          )}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center">
               <HelpCircle className="w-8 h-8" />

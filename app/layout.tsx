@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import TopBar from "@/components/TopBar";
 import AssistantWidget from "@/components/AssistantWidget";
 
 const geistSans = Geist({
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  // Pages that should NOT show the sidebar
+  // Pages that should NOT show the sidebar / top bar (pure landing & auth flows)
   const publicPages = [
     "/",
     "/login",
@@ -32,13 +33,9 @@ export default function RootLayout({
     "/setup",
     "/terms",
     "/privacy",
-    "/support",
   ];
 
   const isPublicPage = publicPages.includes(pathname);
-
-  // Show the AI assistant everywhere except the pure auth/setup forms
-  const hideAssistant = ["/login", "/signup", "/forgot-password", "/setup"].includes(pathname);
 
   return (
     <html
@@ -60,15 +57,16 @@ export default function RootLayout({
           // Public pages without sidebar
           <div className="flex-1">{children}</div>
         ) : (
-          // Authenticated pages with sidebar
-          <div className="flex min-h-screen">
-            <Sidebar/>
-            <div className="flex-1">
-              <div className="p-6 pt-20 bg-[#F1F3F5] min-h-screen">{children}</div>
+          // Authenticated pages: fixed icon rail + top bar
+          <div className="min-h-screen">
+            <Sidebar />
+            <div className="ml-20 flex min-h-screen flex-col">
+              <TopBar />
+              <div className="min-h-0 flex-1 bg-[#F1F3F5] p-6">{children}</div>
             </div>
           </div>
         )}
-        {!hideAssistant && <AssistantWidget />}
+        <AssistantWidget />
       </body>
     </html>
   );

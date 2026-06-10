@@ -15,6 +15,8 @@ import {
   Wallet,
   ShoppingBag,
   MessageSquare,
+  LifeBuoy,
+  RotateCcw,
   X,
 } from "lucide-react";
 import { logout } from "@/app/auth/actions";
@@ -48,9 +50,22 @@ type OrderRow = {
   start_date: string | null;
   end_date: string | null;
   created_at: string;
-  item?: { title: string | null };
+  item?: { title: string | null; available?: boolean };
   borrower?: { full_name: string | null; email: string | null };
   lender?: { full_name: string | null; email: string | null };
+};
+
+type SupportTicket = {
+  id: string;
+  user_id: string | null;
+  name: string | null;
+  email: string | null;
+  category: string | null;
+  subject: string | null;
+  message: string | null;
+  source: string | null;
+  status: string | null;
+  created_at: string;
 };
 
 type ConversationRow = {
@@ -80,10 +95,11 @@ type Stats = {
 
 export default function AdminPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"users" | "items" | "orders" | "chats">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "items" | "orders" | "chats" | "support">("users");
   const [users, setUsers] = useState<UserRow[]>([]);
   const [items, setItems] = useState<ItemRow[]>([]);
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -104,16 +120,18 @@ export default function AdminPage() {
 
   async function loadData() {
     setLoading(true);
-    const [uRes, iRes, oRes, cRes] = await Promise.all([
+    const [uRes, iRes, oRes, cRes, tRes] = await Promise.all([
       fetch("/api/admin/users"),
       fetch("/api/admin/items"),
       fetch("/api/admin/orders"),
       fetch("/api/admin/conversations"),
+      fetch("/api/admin/tickets"),
     ]);
     const uData = await uRes.json();
     const iData = await iRes.json();
     const oData = await oRes.json();
     const cData = await cRes.json();
+    const tData = await tRes.json();
 
     if (uData.error || iData.error) {
       router.push("/login");
@@ -126,6 +144,7 @@ export default function AdminPage() {
     setUsers(uData.users || []);
     setItems(iData.items || []);
     setOrders(ordersList);
+    setTickets(tData.tickets || []);
     setConversations(cData.conversations || []);
     setStats({
       totalUsers: uData.users?.length || 0,
@@ -168,6 +187,24 @@ export default function AdminPage() {
     loadData();
   }
 
+  async function approveCancellation(rentalId: string) {
+    await fetch(`/api/admin/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "approve_cancellation", id: rentalId }),
+    });
+    loadData();
+  }
+
+  async function resolveTicket(id: string, status: "open" | "resolved") {
+    await fetch(`/api/admin/tickets`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    });
+    loadData();
+  }
+
   const filteredUsers = users.filter(
     (u) =>
       u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -187,6 +224,14 @@ export default function AdminPage() {
       o.item?.title?.toLowerCase().includes(search.toLowerCase()) ||
       o.borrower?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       o.lender?.full_name?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredTickets = tickets.filter(
+    (t) =>
+      t.subject?.toLowerCase().includes(search.toLowerCase()) ||
+      t.name?.toLowerCase().includes(search.toLowerCase()) ||
+      t.email?.toLowerCase().includes(search.toLowerCase()) ||
+      t.category?.toLowerCase().includes(search.toLowerCase())
   );
 
   const filteredConversations = conversations.filter((c) =>
@@ -329,6 +374,22 @@ export default function AdminPage() {
             >
               <MessageSquare className="w-4 h-4" />
               Chats
+            </button>
+            <button
+              onClick={() => setActiveTab("support")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                activeTab === "support"
+                  ? "bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white shadow"
+                  : "text-[#2C2C2C]/60 hover:text-[#2C2C2C]"
+              }`}
+            >
+              <LifeBuoy className="w-4 h-4" />
+              Support
+              {tickets.some((t) => t.status !== "resolved") && (
+                <span className="ml-1 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  {tickets.filter((t) => t.status !== "resolved").length}
+                </span>
+              )}
             </button>
           </div>
 
@@ -487,12 +548,13 @@ export default function AdminPage() {
                   <th className="text-left px-6 py-4">Commission</th>
                   <th className="text-left px-6 py-4">Status</th>
                   <th className="text-left px-6 py-4">Date</th>
+                  <th className="text-left px-6 py-4">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F3F5]">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-[#2C2C2C]/40">
+                    <td colSpan={9} className="px-6 py-12 text-center text-[#2C2C2C]/40">
                       No orders found
                     </td>
                   </tr>
@@ -522,6 +584,22 @@ export default function AdminPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#2C2C2C]/50">
                         {new Date(o.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        {o.status === "cancelled" && o.item && o.item.available === false ? (
+                          <button
+                            onClick={() => approveCancellation(o.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#1DA5A6]/10 text-[#1DA5A6] hover:bg-[#1DA5A6]/20 transition-all"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" /> Approve &amp; restore
+                          </button>
+                        ) : o.status === "cancelled" ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-600">
+                            <CheckCircle className="w-3.5 h-3.5" /> Restored
+                          </span>
+                        ) : (
+                          <span className="text-xs text-[#2C2C2C]/30">—</span>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -561,6 +639,62 @@ export default function AdminPage() {
                   </span>
                 </button>
               ))
+            )}
+          </div>
+        )}
+
+        {/* Support Tickets */}
+        {activeTab === "support" && (
+          <div className="space-y-4">
+            {filteredTickets.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm px-6 py-12 text-center text-[#2C2C2C]/40">
+                No support tickets
+              </div>
+            ) : (
+              filteredTickets.map((t) => {
+                const resolved = t.status === "resolved";
+                return (
+                  <div key={t.id} className="bg-white rounded-2xl shadow-sm p-6">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="font-bold text-[#2C2C2C]">{t.subject || "(No subject)"}</h3>
+                          {t.category && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-[#1DA5A6] capitalize">
+                              {t.category}
+                            </span>
+                          )}
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${
+                              resolved ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
+                            }`}
+                          >
+                            {t.status || "open"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#2C2C2C]/50 mb-3">
+                          {t.name || "Unknown"} · {t.email || "—"} · {new Date(t.created_at).toLocaleString()}
+                        </p>
+                        <p className="text-sm text-[#2C2C2C]/80 whitespace-pre-wrap">{t.message}</p>
+                      </div>
+                      <button
+                        onClick={() => resolveTicket(t.id, resolved ? "open" : "resolved")}
+                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                          resolved
+                            ? "bg-[#F1F3F5] text-[#2C2C2C]/60 hover:bg-[#2C2C2C]/10"
+                            : "bg-[#1DA5A6]/10 text-[#1DA5A6] hover:bg-[#1DA5A6]/20"
+                        }`}
+                      >
+                        {resolved ? (
+                          <><RotateCcw className="w-3.5 h-3.5" /> Reopen</>
+                        ) : (
+                          <><CheckCircle className="w-3.5 h-3.5" /> Mark resolved</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
             )}
           </div>
         )}

@@ -35,17 +35,49 @@ export async function POST(request: Request) {
 
   let studentIdPath: string | null = null;
 
-  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: fullName,
-      university,
-    },
-  });
+  async function createAuthUser() {
+    return supabaseAdmin.auth.admin.createUser({
+      email: email as string,
+      password: password as string,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        university,
+      },
+    });
+  }
 
-  if (authError || !authData.user?.id) {
+  let { data: authData, error: authError } = await createAuthUser();
+
+  // If the email is already registered, it may belong to an account that was
+  // previously deleted. Older accounts were "soft deleted" (profile.deleted_at
+  // set) but left the auth user in place, which blocks re-signup. Detect that
+  // leftover, hard-delete it, and retry once so the email can be reused.
+  if (authError) {
+    try {
+      const { data: list } = await supabaseAdmin.auth.admin.listUsers();
+      const existing = list?.users?.find(
+        (u) => u.email?.toLowerCase() === (email as string).toLowerCase()
+      );
+      if (existing) {
+        const { data: existingProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("deleted_at")
+          .eq("id", existing.id)
+          .maybeSingle();
+
+        if (!existingProfile || existingProfile.deleted_at) {
+          await supabaseAdmin.from("profiles").delete().eq("id", existing.id);
+          await supabaseAdmin.auth.admin.deleteUser(existing.id);
+          ({ data: authData, error: authError } = await createAuthUser());
+        }
+      }
+    } catch {
+      // fall through to the error response below
+    }
+  }
+
+  if (authError || !authData?.user?.id) {
     return NextResponse.json(
       {
         error:

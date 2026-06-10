@@ -177,10 +177,13 @@ export async function deleteAccount() {
     if (!user) return { error: "Not authenticated" };
 
     const admin = createAdminClient();
-    const { error } = await admin
-      .from("profiles")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", user.id);
+
+    // Hard delete: remove the profile row (cascades to the user's items,
+    // rentals, favorites, etc. via FKs) and then the auth user itself. This
+    // frees up the email address so the person can sign up again later — a
+    // soft delete (deleted_at) left the auth user behind and blocked re-signup.
+    await admin.from("profiles").delete().eq("id", user.id);
+    const { error } = await admin.auth.admin.deleteUser(user.id);
 
     if (error) return { error: error.message };
 

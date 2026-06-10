@@ -1,3 +1,4 @@
 - [Rentals table quirks](rentals-table-quirks.md) — live DB keeps legacy NOT NULL renter_id/owner_id (not in schema.sql); inserts must set them. Migrations are manual via Supabase SQL Editor.
+- [Admin client bypasses RLS](admin-client-rls-bypass.md) — service-role writes need manual field allowlisting, ownership scoping, and affected-row checks; RLS no longer protects you.
 - [Inspecting the live Supabase DB](supabase-live-db-inspection.md) — executeSql hits Replit's built-in PG (wrong DB); use supabase-js admin client via bash. REST can't run DDL. schema.sql drifts from live DB.
 - [Chat conversation RLS](chat-conversation-rls.md) — live DB blocks user inserts on conversations; create via admin client, not user client.

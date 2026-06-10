@@ -178,19 +178,53 @@ export async function createItem(itemData: {
   }
 }
 
+const EDITABLE_ITEM_FIELDS = [
+  "title",
+  "description",
+  "category",
+  "price",
+  "listing_type",
+  "rental_period",
+  "condition",
+  "location",
+  "deposit",
+  "availability_date",
+  "image_paths",
+] as const;
+
 export async function updateItem(id: string, updates: Partial<Item>) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: "Not authenticated" };
 
-    const { error } = await supabase
+    // Only allow a known set of user-editable columns through. This prevents a
+    // crafted call from mutating protected fields (owner_id, available,
+    // timestamps, etc.) even though we use the service-role client below.
+    const safeUpdates: Record<string, unknown> = {};
+    for (const key of EDITABLE_ITEM_FIELDS) {
+      if (key in updates) safeUpdates[key] = (updates as Record<string, unknown>)[key];
+    }
+
+    if (Object.keys(safeUpdates).length === 0) {
+      return { error: "No valid fields to update" };
+    }
+
+    // Use the admin client (mirroring createItem) but keep ownership enforced
+    // by scoping the update to the caller's own items only, and verify a row
+    // actually changed so non-owned/invalid IDs surface as an error.
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from("items")
-      .update(updates)
+      .update(safeUpdates)
       .eq("id", id)
-      .eq("owner_id", user.id);
+      .eq("owner_id", user.id)
+      .select("id");
 
     if (error) return { error: error.message };
+    if (!data || data.length === 0) {
+      return { error: "Item not found or you don't have permission to edit it" };
+    }
     return { success: true };
   } catch {
     return { error: "An unexpected error occurred" };

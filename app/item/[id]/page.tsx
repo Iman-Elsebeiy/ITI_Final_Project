@@ -325,7 +325,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
           {/* Action Buttons */}
           {isOwner ? (
             <div className="flex gap-3">
-              <Link href="/list-item" className="flex-1 h-14 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg transition-all">
+              <Link href={`/list-item?id=${item.id}`} className="flex-1 h-14 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg transition-all">
                 <Package className="w-5 h-5" /> Edit Item
               </Link>
             </div>

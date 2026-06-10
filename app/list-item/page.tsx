@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Upload,
   X,
@@ -16,7 +16,7 @@ import {
   Image as ImageIcon,
   ArrowLeft,
 } from "lucide-react";
-import { createItem, uploadItemImage } from "@/lib/data/items";
+import { createItem, updateItem, getItemById, uploadItemImage } from "@/lib/data/items";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/types";
 
 type ListItemFormData = {
@@ -49,17 +49,24 @@ const rentalPeriods = [
   { value: "semester", label: "Per Semester", icon: "📚" },
 ];
 
-export default function ListItemPage() {
+function ListItemForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("id");
+  const isEditing = !!editId;
+
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [loadingItem, setLoadingItem] = useState(isEditing);
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<ListItemFormData>({ defaultValues: { listingType: "rent" } });
 
@@ -68,11 +75,45 @@ export default function ListItemPage() {
   const listingType = watch("listingType");
   const isSale = listingType === "sale";
 
+  // In edit mode, load the existing item and prefill the form.
+  useEffect(() => {
+    if (!editId) return;
+    let cancelled = false;
+    setLoadingItem(true);
+    getItemById(editId)
+      .then((item) => {
+        if (cancelled) return;
+        if (!item) {
+          setSubmitError("Item not found.");
+          return;
+        }
+        reset({
+          title: item.title,
+          category: item.category,
+          description: item.description ?? "",
+          condition: item.condition,
+          listingType: item.listing_type,
+          price: item.price,
+          rentalPeriod: item.rental_period,
+          availability: item.availability_date ? item.availability_date.slice(0, 10) : "",
+          location: item.location ?? "",
+          deposit: item.deposit ?? 0,
+        });
+        setExistingImages(item.image_paths || []);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingItem(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, reset]);
+
   const onSubmit = async (data: ListItemFormData) => {
     setIsSubmitting(true);
     setSubmitError("");
 
-    const imageUrls: string[] = [];
+    const imageUrls: string[] = [...existingImages];
     for (const file of uploadedImages) {
       const fd = new FormData();
       fd.append("file", file);
@@ -87,19 +128,41 @@ export default function ListItemPage() {
       }
     }
 
-    const result = await createItem({
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      price: Number(data.price),
-      listing_type: data.listingType,
-      rental_period: (data.listingType === "sale" ? "daily" : data.rentalPeriod) as "hourly" | "daily" | "weekly" | "monthly" | "semester",
-      condition: data.condition,
-      location: data.location,
-      deposit: data.listingType === "sale" ? 0 : (data.deposit ? Number(data.deposit) : 0),
-      availability_date: data.availability || undefined,
-      image_paths: imageUrls.length > 0 ? imageUrls : undefined,
-    });
+    const rentalPeriod = (data.listingType === "sale" ? "daily" : data.rentalPeriod) as
+      | "hourly"
+      | "daily"
+      | "weekly"
+      | "monthly"
+      | "semester";
+    const deposit = data.listingType === "sale" ? 0 : data.deposit ? Number(data.deposit) : 0;
+
+    const result = isEditing
+      ? await updateItem(editId!, {
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          price: Number(data.price),
+          listing_type: data.listingType,
+          rental_period: rentalPeriod,
+          condition: data.condition as "new" | "like-new" | "excellent" | "good" | "fair",
+          location: data.location,
+          deposit,
+          availability_date: data.availability || null,
+          image_paths: imageUrls,
+        })
+      : await createItem({
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          price: Number(data.price),
+          listing_type: data.listingType,
+          rental_period: rentalPeriod,
+          condition: data.condition,
+          location: data.location,
+          deposit,
+          availability_date: data.availability || undefined,
+          image_paths: imageUrls.length > 0 ? imageUrls : undefined,
+        });
 
     setIsSubmitting(false);
 
@@ -110,8 +173,12 @@ export default function ListItemPage() {
 
     setSubmitSuccess(true);
     setTimeout(() => {
-      router.push("/home");
-    }, 2000);
+      router.push(isEditing ? `/item/${editId}` : "/home");
+    }, 1500);
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,15 +199,17 @@ export default function ListItemPage() {
           <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10 text-green-500" />
           </div>
-          <h1 className="text-3xl font-bold text-[#2C2C2C] mb-4">Item Listed Successfully!</h1>
-          <p className="text-[#2C2C2C]/60 mb-8">Your item is now live and visible to other students.</p>
+          <h1 className="text-3xl font-bold text-[#2C2C2C] mb-4">{isEditing ? "Item Updated Successfully!" : "Item Listed Successfully!"}</h1>
+          <p className="text-[#2C2C2C]/60 mb-8">{isEditing ? "Your changes have been saved." : "Your item is now live and visible to other students."}</p>
           <div className="flex gap-4 justify-center">
-            <button onClick={() => router.push("/home")} className="px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-              Go to Dashboard
+            <button onClick={() => router.push(isEditing ? `/item/${editId}` : "/home")} className="px-6 py-3 bg-gradient-to-r from-[#1DA5A6] to-[#194774] text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+              {isEditing ? "View Item" : "Go to Dashboard"}
             </button>
-            <button onClick={() => window.location.reload()} className="px-6 py-3 bg-white border-2 border-[#2C2C2C]/10 text-[#2C2C2C] rounded-xl font-semibold hover:border-[#1DA5A6]/30 transition-all">
-              List Another Item
-            </button>
+            {!isEditing && (
+              <button onClick={() => window.location.reload()} className="px-6 py-3 bg-white border-2 border-[#2C2C2C]/10 text-[#2C2C2C] rounded-xl font-semibold hover:border-[#1DA5A6]/30 transition-all">
+                List Another Item
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -158,8 +227,8 @@ export default function ListItemPage() {
         <button onClick={() => router.back()} className="flex items-center gap-2 text-[#2C2C2C]/60 hover:text-[#2C2C2C] mb-4 transition-colors">
           <ArrowLeft className="w-4 h-4" />Back
         </button>
-        <h1 className="text-3xl font-bold text-[#2C2C2C] mb-2">List a New Item</h1>
-        <p className="text-[#2C2C2C]/60">Share your tools and start earning money</p>
+        <h1 className="text-3xl font-bold text-[#2C2C2C] mb-2">{isEditing ? "Edit Item" : "List a New Item"}</h1>
+        <p className="text-[#2C2C2C]/60">{isEditing ? "Update your listing details" : "Share your tools and start earning money"}</p>
       </div>
 
       {submitError && (
@@ -169,18 +238,30 @@ export default function ListItemPage() {
         </div>
       )}
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-900">
-          <p className="font-semibold mb-1">Tips for a great listing:</p>
-          <ul className="list-disc list-inside space-y-1 text-blue-700">
-            <li>Use clear, high-quality photos</li>
-            <li>Describe the item&apos;s condition honestly</li>
-            <li>Set competitive rental prices</li>
-            <li>Be responsive to messages</li>
-          </ul>
+      {loadingItem && (
+        <div className="bg-white rounded-xl p-4 mb-6 flex items-center gap-3 text-[#2C2C2C]/60">
+          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <p className="text-sm font-semibold">Loading item…</p>
         </div>
-      </div>
+      )}
+
+      {!isEditing && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-900">
+            <p className="font-semibold mb-1">Tips for a great listing:</p>
+            <ul className="list-disc list-inside space-y-1 text-blue-700">
+              <li>Use clear, high-quality photos</li>
+              <li>Describe the item&apos;s condition honestly</li>
+              <li>Set competitive rental prices</li>
+              <li>Be responsive to messages</li>
+            </ul>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-white rounded-2xl shadow-md p-6">
@@ -221,16 +302,28 @@ export default function ListItemPage() {
               </div>
             </div>
 
-            {uploadedImages.length > 0 && (
+            {(existingImages.length > 0 || uploadedImages.length > 0) && (
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {existingImages.map((url, index) => (
+                  <div key={`existing-${index}`} className="relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Photo ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                    <button type="button" onClick={() => removeExistingImage(index)}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-4 h-4" />
+                    </button>
+                    {index === 0 && <span className="absolute bottom-1 left-1 bg-[#1DA5A6] text-white text-xs px-2 py-0.5 rounded">Cover</span>}
+                  </div>
+                ))}
                 {uploadedImages.map((file, index) => (
-                  <div key={index} className="relative group">
+                  <div key={`new-${index}`} className="relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
                     <button type="button" onClick={() => removeImage(index)}
                       className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <X className="w-4 h-4" />
                     </button>
-                    {index === 0 && <span className="absolute bottom-1 left-1 bg-[#1DA5A6] text-white text-xs px-2 py-0.5 rounded">Cover</span>}
+                    {existingImages.length === 0 && index === 0 && <span className="absolute bottom-1 left-1 bg-[#1DA5A6] text-white text-xs px-2 py-0.5 rounded">Cover</span>}
                   </div>
                 ))}
               </div>
@@ -369,12 +462,20 @@ export default function ListItemPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Publishing...
+                {isEditing ? "Saving..." : "Publishing..."}
               </span>
-            ) : "Publish Item"}
+            ) : isEditing ? "Save Changes" : "Publish Item"}
           </button>
         </div>
       </form>
     </div>
+  );
+}
+
+export default function ListItemPage() {
+  return (
+    <Suspense fallback={null}>
+      <ListItemForm />
+    </Suspense>
   );
 }
